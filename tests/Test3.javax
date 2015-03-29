@@ -1,0 +1,54 @@
+public class StudentSample {
+	
+	public static void main(String[] args) {
+		openfile { "text.txt" }
+		
+		String text = null;
+	
+	    while ((text = reader.readLine()) != null) {
+	        list.add(text);
+	    }
+	    
+		//print out the list
+		System.out.println(list);
+	}
+}
+
+
+
+
+List<String> list = new ArrayList<String>();
+File file = new File("text.txt");
+BufferedReader reader = null;
+BufferedWriter writer = null;
+
+try {
+    reader = new BufferedReader(new FileReader(file));
+    writer = new BufferedWriter(new FileWriter(file));
+    
+    
+    
+    
+    // USER CODE GOES HERE
+    
+    
+    
+    
+    
+    
+} catch (FileNotFoundException e) {
+    e.printStackTrace();
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    try {
+    	if (reader != null) {
+            reader.close();
+        }
+    	if (writer != null) {
+            writer.close();
+        }
+    } catch (IOException e) {
+    	e.printStackTrace()
+    }
+}
