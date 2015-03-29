@@ -12,7 +12,7 @@ public class A2MainRunner {
 		/*
 		 * These tests will be testing correctness of your Semantic Analysis visitors. The marker will be using their own files here. 
 		 */
-		for (int i = 1; i <= 3; i++) { 
+		for (int i = 1; i <= 2; i++) { 
 			String file = "tests"+System.getProperty("file.separator")+"Test"+i+".javax";
 			try {
 				A2Compiler.compile(new File(file));
@@ -37,9 +37,11 @@ public class A2MainRunner {
 			A2Compiler.compile(new File("src"+System.getProperty("file.separator")+"se701"+System.getProperty("file.separator")+"StudentSample.javax"));
 			System.out.println("src/se701.StudentSample compiled correctly");
 		} catch (ParseException e) {
-			System.err.println("Student file should not have any errors! ");
+			System.err.println("Student file should not have any errors!");
+			e.printStackTrace();
 		} catch (A2SemanticsException e) {
-			System.err.println("Student file should not have any errors! ");
+			System.err.println("Student file should not have any errors!");
+			e.printStackTrace();
 		}  catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}

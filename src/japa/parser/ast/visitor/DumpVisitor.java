@@ -953,24 +953,7 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("}");
 
     }
-
-    // MY OPENFILE STUFF
-    public void visit(FileStmt n, Object arg) {
-        printer.printLn("//OPENFILE BLOCK STARTS HERE");
-        printer.printLn("{");
-        if (n.getStmts() != null) {
-            printer.indent();
-            for (Statement s : n.getStmts()) {
-                s.accept(this, arg);
-                printer.printLn();
-            }
-            printer.unindent();
-        }
-        printer.print("}");
-        printer.print("//OPENFILE BLOCK ENDS HERE");
-
-    }
-
+    
     public void visit(LabeledStmt n, Object arg) {
         printer.print(n.getLabel());
         printer.print(": ");
@@ -1315,4 +1298,25 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(n.getContent());
         printer.printLn("*/");
     }
+
+    // MY OPENFILE STUFF
+    @Override
+    public void visit(FileStmt n, Object arg) {
+        printer.printLn("//OPENFILE BLOCK STARTS HERE");
+        
+        printer.printLn("{");
+        if (n.getStmts() != null) {
+            printer.indent();
+            for (Statement s : n.getStmts()) {
+                s.accept(this, arg);
+                printer.printLn();
+            }
+            printer.unindent();
+        }
+        printer.print("}");
+        
+        printer.print("//OPENFILE BLOCK ENDS HERE");
+
+    }
+
 }
