@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentSample {
-	
+
     public static void main(String[] args) {
         List<String> list = new ArrayList<String>();
 
         //OPENFILE BLOCK STARTS HERE
 
-        File file = new File("tests/text.txt");
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new FileReader(file));
+            reader = new BufferedReader(new FileReader(new File("tests/text.txt")));
             {
                 String text = null;
                 while ((text = reader.readLine()) != null) {
@@ -36,20 +35,20 @@ public class StudentSample {
                 if (reader != null) {
                     reader.close();
                 }
-                file = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         //OPENFILE BLOCK ENDS HERE
 
+        System.out.println("List is: " + list);
 
         //OPENFILE BLOCK STARTS HERE
 
-        File file = new File("tests/text.txt");
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(file));
+            writer = new BufferedWriter(new FileWriter(new File("tests/text.txt")));
             {
                 String text = null;
                 for (String s : list) {
@@ -65,7 +64,6 @@ public class StudentSample {
                 if (writer != null) {
                     writer.close();
                 }
-                file = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,6 +71,34 @@ public class StudentSample {
 
         //OPENFILE BLOCK ENDS HERE
 
-        System.out.println(list);
+
+        //OPENFILE BLOCK STARTS HERE
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(new File("tests/text.txt")));
+            {
+                String text = null;
+                while ((text = reader.readLine()) != null) {
+                    list.add(text);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //OPENFILE BLOCK ENDS HERE
+
+        System.out.println("After writing back to the file, the list is now: " + list);
     }
 }

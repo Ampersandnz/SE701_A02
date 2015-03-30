@@ -1310,8 +1310,6 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn("//OPENFILE BLOCK STARTS HERE");
         printer.printLn();
         
-        printer.printLn("File file = new File(" + n.filename + ");");
-        
         if (n.read) {
         	printer.printLn("BufferedReader reader = null;");
         } else if (n.write) {
@@ -1321,9 +1319,9 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn("try {");
         printer.indent();
         if (n.read) {
-        	printer.printLn("reader = new BufferedReader(new FileReader(file));");
+        	printer.printLn("reader = new BufferedReader(new FileReader(new File(" + n.filename + ")));");
         } else if (n.write) {
-        	printer.printLn("writer = new BufferedWriter(new FileWriter(file));");
+        	printer.printLn("writer = new BufferedWriter(new FileWriter(new File(" + n.filename + ")));");
         }
         
         printer.printLn("{");
@@ -1365,8 +1363,6 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 	        printer.unindent();
 	        printer.printLn("}");
         }
-        
-        printer.printLn("file = null;");
         
         printer.unindent();
         printer.printLn("} catch (IOException e) {");

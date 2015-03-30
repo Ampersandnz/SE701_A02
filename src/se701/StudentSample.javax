@@ -22,14 +22,24 @@ public class StudentSample {
 	        }
         }
         
+		//print out the list
+		System.out.println("List is: " + list);
+        
         openfile { "tests/text.txt" w
 			String text = null;
 	        for (String s: list) {
 	        	writer.write(s);
 	        }
         }
+        
+		openfile { "tests/text.txt" r
+			String text = null;
+	        while ((text = reader.readLine()) != null) {
+	            list.add(text);
+	        }
+        }
 	    
 		//print out the list
-		System.out.println(list);
+		System.out.println("After writing back to the file, the list is now: " + list);
 	}
 }
