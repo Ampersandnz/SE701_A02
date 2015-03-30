@@ -1299,10 +1299,33 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn("*/");
     }
 
-    // MY OPENFILE STUFF
     @Override
     public void visit(FileStmt n, Object arg) {
+        
+        //TODO: Alter so that the first two lines of the block are options - filename, read/write
+    	//TODO: Alter so that the catch, finally, closing stuff all happens after the last use of reader/writer (as applicable)
+    	//TODO: Ie the openfile{} block should only contain a filename and "r" or "w", everything else should be handled by my compiler
+    	
+        printer.printLn();
         printer.printLn("//OPENFILE BLOCK STARTS HERE");
+        printer.printLn();
+        
+        printer.printLn("List<String> list = new ArrayList<String>();");
+        printer.printLn("File file = new File(" + n.filename + ");");
+        
+        if (n.read) {
+        	printer.printLn("BufferedReader reader = null;");
+        } else if (n.write) {
+        	printer.printLn("BufferedWriter writer = null;");
+        }
+        
+        printer.printLn("try {");
+        printer.indent();
+        if (n.read) {
+        	printer.printLn("reader = new BufferedReader(new FileReader(file));");
+        } else if (n.write) {
+        	printer.printLn("writer = new BufferedWriter(new FileWriter(file));");
+        }
         
         printer.printLn("{");
         if (n.getStmts() != null) {
@@ -1314,9 +1337,47 @@ public final class DumpVisitor implements VoidVisitor<Object> {
             printer.unindent();
         }
         printer.print("}");
+        printer.printLn();
         
-        printer.print("//OPENFILE BLOCK ENDS HERE");
+        printer.unindent();
+        printer.printLn("} catch (FileNotFoundException e) {");
+        printer.indent();
+        printer.printLn("e.printStackTrace();");
+        printer.unindent();
+        printer.printLn("} catch (IOException e) {");
+        printer.indent();
+        printer.printLn("e.printStackTrace();");
+        printer.unindent();
+        printer.printLn("} finally {");
+        printer.indent();
+        printer.printLn("try {");
+        printer.indent();
+        
+        if (n.read) {
+	        printer.printLn("if (reader != null) {");
+	        printer.indent();
+	        printer.printLn("reader.close();");
+	        printer.unindent();
+	        printer.printLn("}");
+        } else if (n.write) {
+	        printer.printLn("if (writer != null) {");
+	        printer.indent();
+	        printer.printLn("writer.close();");
+	        printer.unindent();
+	        printer.printLn("}");
+        }
+        
+        printer.unindent();
+        printer.printLn("} catch (IOException e) {");
+        printer.indent();
+        printer.printLn("e.printStackTrace();");
+        printer.unindent();
+        printer.printLn("}");
+        printer.unindent();
+        printer.printLn("}");
 
+        printer.printLn();
+        printer.printLn("//OPENFILE BLOCK ENDS HERE");
+        
     }
-
 }

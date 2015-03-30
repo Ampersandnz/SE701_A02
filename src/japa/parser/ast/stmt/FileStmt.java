@@ -32,10 +32,20 @@ import java.util.List;
 public final class FileStmt extends Statement {
 
     private final List<Statement> stmts;
+    public final String filename;
+    public final boolean read;
+    public final boolean write;
 
-    public FileStmt(int beginLine, int beginColumn, int endLine, int endColumn, List<Statement> stmts) {
+    public FileStmt(int beginLine, int beginColumn, int endLine, int endColumn, List<Statement> stmts, String filename, boolean read, boolean write) {
         super(beginLine, beginColumn, endLine, endColumn);
         this.stmts = stmts;
+        this.filename = filename;
+        this.read = read;
+        this.write = write;
+
+        System.out.println("Filename = " + filename);
+        System.out.println("Read = " + read);
+        System.out.println("Write = " + write);
     }
 
     public List<Statement> getStmts() {
