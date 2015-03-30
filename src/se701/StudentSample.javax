@@ -13,10 +13,19 @@ import java.util.List;
 public class StudentSample {
 	
 	public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+       
 		openfile { "tests/text.txt" r
 			String text = null;
 	        while ((text = reader.readLine()) != null) {
 	            list.add(text);
+	        }
+        }
+        
+        openfile { "tests/text.txt" w
+			String text = null;
+	        for (String s: list) {
+	        	writer.write(s);
 	        }
         }
 	    

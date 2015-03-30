@@ -1302,7 +1302,7 @@ public final class DumpVisitor implements VoidVisitor<Object> {
     @Override
     public void visit(FileStmt n, Object arg) {
         
-        //TODO: Alter so that the first two lines of the block are options - filename, read/write
+    	//TODO: Check if the variable 'file' has already been declared. If so, don't declare it again.
     	//TODO: Alter so that the catch, finally, closing stuff all happens after the last use of reader/writer (as applicable)
     	//TODO: Ie the openfile{} block should only contain a filename and "r" or "w", everything else should be handled by my compiler
     	
@@ -1310,7 +1310,6 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn("//OPENFILE BLOCK STARTS HERE");
         printer.printLn();
         
-        printer.printLn("List<String> list = new ArrayList<String>();");
         printer.printLn("File file = new File(" + n.filename + ");");
         
         if (n.read) {
@@ -1366,6 +1365,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 	        printer.unindent();
 	        printer.printLn("}");
         }
+        
+        printer.printLn("file = null;");
         
         printer.unindent();
         printer.printLn("} catch (IOException e) {");

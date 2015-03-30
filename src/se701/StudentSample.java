@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StudentSample {
-
+	
     public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
 
         //OPENFILE BLOCK STARTS HERE
 
-        List<String> list = new ArrayList<String>();
         File file = new File("tests/text.txt");
         BufferedReader reader = null;
         try {
@@ -36,6 +36,36 @@ public class StudentSample {
                 if (reader != null) {
                     reader.close();
                 }
+                file = null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //OPENFILE BLOCK ENDS HERE
+
+
+        //OPENFILE BLOCK STARTS HERE
+
+        File file = new File("tests/text.txt");
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file));
+            {
+                String text = null;
+                for (String s : list) {
+                    writer.write(s);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+                file = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
