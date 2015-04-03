@@ -1,4 +1,4 @@
-package symtab;
+package symboltable;
 
 public class MethodSymbol extends ScopedSymbol {
 

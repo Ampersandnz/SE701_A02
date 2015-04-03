@@ -1,4 +1,4 @@
-package symtab;
+package symboltable;
 
 public class BuiltInTypeSymbol extends Symbol implements Type {
 	

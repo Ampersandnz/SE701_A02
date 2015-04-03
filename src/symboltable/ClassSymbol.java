@@ -1,4 +1,4 @@
-package symtab;
+package symboltable;
 
 public class ClassSymbol extends ScopedSymbol implements Type {
 
