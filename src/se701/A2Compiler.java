@@ -1,15 +1,15 @@
 package se701;
 
+import japa.parser.JavaParser;
+import japa.parser.ParseException;
+import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.visitor.CreateScopesVisitor;
+import japa.parser.ast.visitor.DumpVisitor;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
-
-import japa.parser.JavaParser;
-import japa.parser.ParseException;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.visitor.SillyBreakVisitor;
-import japa.parser.ast.visitor.DumpVisitor;
 
 public class A2Compiler {
 	
@@ -21,13 +21,14 @@ public class A2Compiler {
 		// parse the input, performs lexical and syntatic analysis
 		JavaParser parser = new JavaParser(new FileReader(file));
 		CompilationUnit ast = parser.CompilationUnit();
-		
-		// perform visit 1...
-		
-		// perform visit 2... etc etc 
-		// ...
-		
-		// perform visit N 
+
+		// TODO: VISITS TO PERFORM:
+		// Create scopes
+		CreateScopesVisitor createScopes = new CreateScopesVisitor();
+		ast.accept(createScopes, null);
+		// Create variables
+		//
+
 		DumpVisitor printVisitor = new DumpVisitor();
 		ast.accept(printVisitor, null);
 		

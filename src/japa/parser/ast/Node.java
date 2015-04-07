@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -24,6 +24,7 @@ package japa.parser.ast;
 import japa.parser.ast.visitor.DumpVisitor;
 import japa.parser.ast.visitor.GenericVisitor;
 import japa.parser.ast.visitor.VoidVisitor;
+import symboltable.Scope;
 
 /**
  * @author Julio Vilmar Gesser
@@ -42,6 +43,8 @@ public abstract class Node {
      * This attribute can store additional information from semantic analysis.
      */
     private Object data;
+
+	private Scope enclosingScope;
 
     @Deprecated
     public Node(int line, int column) {
@@ -102,5 +105,13 @@ public abstract class Node {
         accept(visitor, null);
         return visitor.getSource();
     }
+
+	public Scope getEnclosingScope() {
+		return enclosingScope;
+	}
+
+	public void setEnclosingScope(Scope enclosingScope) {
+		this.enclosingScope = enclosingScope;
+	}
 
 }

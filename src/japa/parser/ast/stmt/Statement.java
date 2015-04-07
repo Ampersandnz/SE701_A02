@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -22,11 +22,14 @@
 package japa.parser.ast.stmt;
 
 import japa.parser.ast.Node;
+import symboltable.Scope;
 
 /**
  * @author Julio Vilmar Gesser
  */
 public abstract class Statement extends Node {
+
+	private Scope enclosingScope;
 
     public Statement(int beginLine, int beginColumn, int endLine, int endColumn) {
         super(beginLine, beginColumn, endLine, endColumn);
@@ -35,5 +38,13 @@ public abstract class Statement extends Node {
     public Statement(int line, int column) {
         super(line, column);
     }
+
+	public Scope getEnclosingScope() {
+		return enclosingScope;
+	}
+
+	public void setEnclosingScope(Scope currentScope) {
+		this.enclosingScope = currentScope;
+	}
 
 }

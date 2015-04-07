@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -23,12 +23,15 @@ package japa.parser.ast.body;
 
 import java.util.List;
 
+import symboltable.Scope;
+
 /**
  * @author Julio Vilmar Gesser
  */
 public abstract class TypeDeclaration extends BodyDeclaration {
 
     private final String name;
+	protected Scope enclosingScope;
 
     private final int modifiers;
 
@@ -52,5 +55,13 @@ public abstract class TypeDeclaration extends BodyDeclaration {
     public List<BodyDeclaration> getMembers() {
         return members;
     }
+
+	public void setScope(Scope enclosingScope) {
+		this.enclosingScope = enclosingScope;
+	}
+
+	public Scope getScope() {
+		return enclosingScope;
+	}
 
 }

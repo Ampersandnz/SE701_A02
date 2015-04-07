@@ -3,15 +3,15 @@ package symboltable;
 public class BaseScope implements Scope  {
 
 	public BaseScope() {
-		define(new BuiltInTypeSymbol("int"));
-		define(new BuiltInTypeSymbol("boolean"));
-		define(new BuiltInTypeSymbol("double"));
-		define(new BuiltInTypeSymbol("float"));
-		define(new BuiltInTypeSymbol("byte"));
-		define(new BuiltInTypeSymbol("short"));
-		define(new BuiltInTypeSymbol("char"));
-
-		define(new ClassSymbol("String"));
+		// define(new BuiltInTypeSymbol("int"));
+		// define(new BuiltInTypeSymbol("boolean"));
+		// define(new BuiltInTypeSymbol("double"));
+		// define(new BuiltInTypeSymbol("float"));
+		// define(new BuiltInTypeSymbol("byte"));
+		// define(new BuiltInTypeSymbol("short"));
+		// define(new BuiltInTypeSymbol("char"));
+		//
+		// define(new ClassSymbol("String"));
 	}
 
 	@Override
