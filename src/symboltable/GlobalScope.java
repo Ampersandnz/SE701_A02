@@ -1,16 +1,21 @@
 package symboltable;
 
-import java.util.HashMap;
-
 import se701.A2SemanticsException;
 
 public class GlobalScope extends BaseScope {
-
-	private HashMap<String, Symbol> symbols = new HashMap<String, Symbol>();
-	protected Scope enclosingScope = null;
 	
 	public GlobalScope() {
 		super();
+
+		define(new BuiltInTypeSymbol("int"));
+		define(new BuiltInTypeSymbol("boolean"));
+		define(new BuiltInTypeSymbol("double"));
+		define(new BuiltInTypeSymbol("float"));
+		define(new BuiltInTypeSymbol("byte"));
+		define(new BuiltInTypeSymbol("short"));
+		define(new BuiltInTypeSymbol("char"));
+
+		define(new ClassSymbol("String"));
 	}
 	
 	@Override
@@ -31,7 +36,8 @@ public class GlobalScope extends BaseScope {
 	@Override
 	public void define(Symbol symbol) {
 		String name = symbol.getName();
-		if (symbols.get(name) != null) {
+
+		if (this.resolve(name) != null) {
 			throw new A2SemanticsException("\"" + name
 					+ "\" is already defined in scope " + getScopeName());
 		}
