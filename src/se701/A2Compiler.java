@@ -3,7 +3,10 @@ package se701;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.visitor.CreateMethodsVisitor;
 import japa.parser.ast.visitor.CreateScopesVisitor;
+import japa.parser.ast.visitor.CreateTypesVisitor;
+import japa.parser.ast.visitor.CreateVariablesVisitor;
 import japa.parser.ast.visitor.DumpVisitor;
 
 import java.io.File;
@@ -22,12 +25,21 @@ public class A2Compiler {
 		JavaParser parser = new JavaParser(new FileReader(file));
 		CompilationUnit ast = parser.CompilationUnit();
 
-		// TODO: VISITS TO PERFORM:
 		// Create scopes
 		CreateScopesVisitor createScopes = new CreateScopesVisitor();
 		ast.accept(createScopes, null);
+
+		// Create types
+		CreateTypesVisitor createTypes = new CreateTypesVisitor();
+		ast.accept(createTypes, null);
+
 		// Create variables
-		//
+		CreateVariablesVisitor createVariables = new CreateVariablesVisitor();
+		ast.accept(createVariables, null);
+
+		// Create methods
+		CreateMethodsVisitor createMethods = new CreateMethodsVisitor();
+		ast.accept(createMethods, null);
 
 		DumpVisitor printVisitor = new DumpVisitor();
 		ast.accept(printVisitor, null);

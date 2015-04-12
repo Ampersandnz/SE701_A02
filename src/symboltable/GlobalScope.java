@@ -25,12 +25,13 @@ public class GlobalScope extends BaseScope {
 
 	@Override
 	public Scope getEnclosingScope() {
-		return enclosingScope;
+		return null;
 	}
 
 	@Override
 	public void setEnclosingScope(Scope scope) {
-		this.enclosingScope = scope;
+		throw new IllegalArgumentException(
+				"GlobalScope cannot have an enclosing scope!");
 	}
 
 	@Override

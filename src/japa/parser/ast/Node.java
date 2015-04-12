@@ -44,6 +44,8 @@ public abstract class Node {
      */
     private Object data;
 
+	// Not actually always the enclosing scope - for scoped nodes this will
+	// return the Scope representing that node itself.
 	private Scope enclosingScope;
 
     @Deprecated
