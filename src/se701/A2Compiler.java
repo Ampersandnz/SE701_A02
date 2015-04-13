@@ -3,7 +3,6 @@ package se701;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.visitor.CreateMethodsVisitor;
 import japa.parser.ast.visitor.CreateScopesVisitor;
 import japa.parser.ast.visitor.CreateTypesVisitor;
 import japa.parser.ast.visitor.CreateVariablesVisitor;
@@ -36,10 +35,6 @@ public class A2Compiler {
 		// Create variables
 		CreateVariablesVisitor createVariables = new CreateVariablesVisitor();
 		ast.accept(createVariables, null);
-
-		// Create methods
-		CreateMethodsVisitor createMethods = new CreateMethodsVisitor();
-		ast.accept(createMethods, null);
 
 		DumpVisitor printVisitor = new DumpVisitor();
 		ast.accept(printVisitor, null);

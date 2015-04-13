@@ -36,6 +36,7 @@ import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.ConditionalExpr;
 import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.EnclosedExpr;
+import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.InstanceOfExpr;
 import japa.parser.ast.expr.IntegerLiteralExpr;
@@ -90,18 +91,18 @@ import java.util.Iterator;
 
 import se701.A2SemanticsException;
 import symboltable.ClassSymbol;
-import symboltable.GlobalScope;
-import symboltable.LocalScope;
+import symboltable.InterfaceSymbol;
 import symboltable.MethodSymbol;
 import symboltable.Scope;
 import symboltable.Symbol;
 import symboltable.Type;
+import symboltable.VariableSymbol;
 
 /**
  * @author Michael Lo
  */
 
-public class CreateScopesVisitor implements VoidVisitor<Object> {
+public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 
 	private Scope currentScope;
 
@@ -112,19 +113,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(CompilationUnit n, Object arg) {
-		GlobalScope globalScope = new GlobalScope();
-		currentScope = globalScope;
-		n.setEnclosingScope(currentScope);
-
-		if (n.getPakage() != null) {
-			n.getPakage().accept(this, arg);
-		}
-
-		if (n.getImports() != null) {
-			for (ImportDeclaration i : n.getImports()) {
-				i.accept(this, arg);
-			}
-		}
+		currentScope = n.getEnclosingScope();
 
 		if (n.getTypes() != null) {
 			for (Iterator<TypeDeclaration> i = n.getTypes().iterator(); i
@@ -136,567 +125,459 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(FileStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(PackageDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
-		n.getName().accept(this, arg);
 	}
 
 	@Override
 	public void visit(ImportDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
-		n.getName().accept(this, arg);
 	}
 
 	@Override
 	public void visit(TypeParameter n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(LineComment n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(BlockComment n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
-		if (n.isInterface()) {
-			// TODO Is a scope - can have fields + has method signatures.
-		} else {
-			ClassSymbol classSymbol =  new ClassSymbol(n.getName());
-			classSymbol.setEnclosingScope(currentScope);
-
-			currentScope = classSymbol;
-			n.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
+		
+		if (currentScope instanceof ClassSymbol) {
 
 			if (n.getMembers() != null) {
 				for (BodyDeclaration b : n.getMembers()) {
 					b.accept(this, arg);
 				}
 			}
+		} else if (currentScope instanceof InterfaceSymbol) {
 
-			currentScope = currentScope.getEnclosingScope();
+			if (n.getMembers() != null) {
+				for (BodyDeclaration b : n.getMembers()) {
+					b.accept(this, arg);
+				}
+			}
+		} else {
+			throw new A2SemanticsException(
+					"Scope of ClassOrInterfaceDeclaration not a ClassSymbol or an InterfaceSymbol! (is a "
+							+ currentScope.getClass().getName() + ")");
 		}
+		currentScope = n.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(EnumDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(EmptyTypeDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(EnumConstantDeclaration n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		if (n.getClassBody() != null) {
-			for (BodyDeclaration b : n.getClassBody()) {
-				b.accept(this, arg);
-			}
-		}
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(AnnotationDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(AnnotationMemberDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(FieldDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
+
+		for (VariableDeclarator v : n.getVariables()) {
+			Symbol resolved = currentScope.resolve(n.getType().toString());
+			Type type = null;
+
+			if (resolved instanceof Type) {
+				type = (Type) resolved;
+			} else {
+				throw new A2SemanticsException(resolved.getName()
+						+ " is not a type! Is a " + resolved.getClass().getName());
+			}
+
+			String name = v.getId().toString();
+			VariableSymbol symbol = new VariableSymbol(name, type);
+			symbol.setDefinedLine(v.getBeginLine());
+			currentScope.define(symbol);
+		}
 	}
 
 	@Override
 	public void visit(VariableDeclarator n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(VariableDeclaratorId n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ConstructorDeclaration n, Object arg) {
-		MethodSymbol methodSymbol = new MethodSymbol(n.getName(), null);
-		methodSymbol.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
 
-		Symbol returnSymbol = currentScope.resolve(n.getName());
-		
-		if (returnSymbol instanceof Type) {
-			Type returnType = (Type) returnSymbol;
-			methodSymbol.setReturnType(returnType);
+		if (currentScope instanceof MethodSymbol) {
+			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
+
+			if (n.getBlock() != null) {
+				n.getBlock().accept(this, arg);
+			}
 		} else {
-			throw new A2SemanticsException("Return type of method/constructor "
-					+ n.getName() + " is not a Type! (is "
-					+ returnSymbol.getName() + ")");
+			throw new A2SemanticsException(
+					"Scope of MethodDeclaration not a MethodSymbol! (is a "
+							+ currentScope.getClass().getName() + ")");
 		}
-
-		currentScope = methodSymbol;
-		n.setEnclosingScope(currentScope);
-
-		n.getBlock().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
+		currentScope = n.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(MethodDeclaration n, Object arg) {
-		MethodSymbol methodSymbol = new MethodSymbol(n.getName(), null);
-		methodSymbol.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
 
-		Symbol returnSymbol = currentScope.resolve(n.getType().toString());
+		if (currentScope instanceof MethodSymbol) {
+			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
 
-		if (returnSymbol instanceof Type) {
-			Type returnType = (Type) returnSymbol;
-			methodSymbol.setReturnType(returnType);
+			if (n.getBody() != null) {
+				n.getBody().accept(this, arg);
+			}
 		} else {
-			throw new A2SemanticsException("Return type of method/constructor "
-					+ n.getName() + " is not a Type! (is "
-					+ returnSymbol.getName() + ")");
+			throw new A2SemanticsException(
+					"Scope of MethodDeclaration not a MethodSymbol! (is a "
+							+ currentScope.getClass().getName() + ")");
 		}
+		currentScope = n.getEnclosingScope();
 
-		currentScope = methodSymbol;
-		n.setEnclosingScope(currentScope);
+		if (n.getParameters() != null) {
+			for (Parameter p : n.getParameters()) {
+				Symbol resolved = currentScope.resolve(p.getType().toString());
+				Type type = null;
 
-		n.getBody().accept(this, arg);
+				if (resolved instanceof Type) {
+					type = (Type) resolved;
+				} else {
+					throw new A2SemanticsException(resolved.getName()
+							+ " is not a type! Is a "
+							+ resolved.getClass().getName());
+				}
 
-		currentScope = currentScope.getEnclosingScope();
+				String name = p.getId().toString();
+				VariableSymbol symbol = new VariableSymbol(name, type);
+				symbol.setDefinedLine(p.getBeginLine());
+				currentScope.define(symbol);
+			}
+		}
 	}
 
 	@Override
 	public void visit(Parameter n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(EmptyMemberDeclaration n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(InitializerDeclaration n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-		
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getBlock().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(JavadocComment n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ClassOrInterfaceType n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(PrimitiveType n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ReferenceType n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(VoidType n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(WildcardType n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ArrayAccessExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ArrayCreationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ArrayInitializerExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(AssignExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(BinaryExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(CastExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ClassExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ConditionalExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(EnclosedExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(FieldAccessExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(InstanceOfExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(StringLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(IntegerLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(LongLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(IntegerLiteralMinValueExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(LongLiteralMinValueExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(CharLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(DoubleLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(BooleanLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(NullLiteralExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(MethodCallExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(NameExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ObjectCreationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(QualifiedNameExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(SuperMemberAccessExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ThisExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(SuperExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(UnaryExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
+
+		for (VariableDeclarator v : n.getVars()) {
+			Symbol resolved = currentScope.resolve(n.getType().toString());
+			Type type = null;
+
+			if (resolved instanceof Type) {
+				type = (Type) resolved;
+			} else {
+				throw new A2SemanticsException(resolved.getName()
+						+ " is not a type! Is a "
+						+ resolved.getClass().getName());
+			}
+
+			String name = v.getId().toString();
+			VariableSymbol symbol = new VariableSymbol(name, type);
+			symbol.setDefinedLine(v.getBeginLine());
+			currentScope.define(symbol);
+		}
 	}
 
 	@Override
 	public void visit(MarkerAnnotationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(SingleMemberAnnotationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(NormalAnnotationExpr n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(MemberValuePair n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(TypeDeclarationStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(AssertStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(BlockStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
 
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		if (n.getStmts() != null) {
-			for (Statement s : n.getStmts()) {
-				s.accept(this, arg);
-			}
+		for (Statement s : n.getStmts()) {
+			s.accept(this, arg);
 		}
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(LabeledStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(EmptyStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ExpressionStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
+		currentScope = n.getEnclosingScope();
+		
+		Expression e = n.getExpression();
+
+		if (e instanceof VariableDeclarationExpr) {
+			VariableDeclarationExpr d = (VariableDeclarationExpr) e;
+
+			for (VariableDeclarator v : d.getVars()) {
+				Symbol resolved = currentScope.resolve(d.getType().toString());
+				Type type = null;
+
+				if (resolved instanceof Type) {
+					type = (Type) resolved;
+				} else {
+					throw new A2SemanticsException(resolved.getName()
+							+ " is not a type! Is a "
+							+ resolved.getClass().getName());
+				}
+
+				String name = v.getId().toString();
+				VariableSymbol symbol = new VariableSymbol(name, type);
+				symbol.setDefinedLine(v.getBeginLine());
+				currentScope.define(symbol);
+			}
+
+		}
 	}
 
 	@Override
 	public void visit(SwitchStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		if (n.getEntries() != null) {
-			for (SwitchEntryStmt s : n.getEntries()) {
-				s.accept(this, arg);
-			}
-		}
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(SwitchEntryStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(BreakStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(ReturnStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(IfStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		if (n.getThenStmt() != null) {
-			n.getThenStmt().accept(this, arg);
-		}
-
-		if (n.getElseStmt() != null) {
-			n.getElseStmt().accept(this, arg);
-		}
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(WhileStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getBody().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(ContinueStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(DoStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getBody().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(ForeachStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getBody().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(ForStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getBody().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(ThrowStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(SynchronizedStmt n, Object arg) {
-		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
 	public void visit(TryStmt n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getTryBlock().accept(this, arg);
-
-		if (n.getFinallyBlock() != null) {
-			n.getFinallyBlock().accept(this, arg);
-		}
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(CatchClause n, Object arg) {
-		LocalScope localScope = new LocalScope();
-		localScope.setEnclosingScope(currentScope);
-
-		currentScope = localScope;
-		n.setEnclosingScope(currentScope);
-
-		n.getCatchBlock().accept(this, arg);
-
-		currentScope = currentScope.getEnclosingScope();
 	}
 }

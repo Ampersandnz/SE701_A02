@@ -210,6 +210,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 			String name = v.getId().toString();
 			VariableSymbol symbol = new VariableSymbol(name, type);
+			symbol.setDefinedLine(v.getBeginLine());
 			currentScope.define(symbol);
 		}
 	}
@@ -272,6 +273,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 				String name = p.getId().toString();
 				VariableSymbol symbol = new VariableSymbol(name, type);
+				symbol.setDefinedLine(p.getBeginLine());
 				currentScope.define(symbol);
 			}
 		}
@@ -443,6 +445,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 			String name = v.getId().toString();
 			VariableSymbol symbol = new VariableSymbol(name, type);
+			symbol.setDefinedLine(v.getBeginLine());
 			currentScope.define(symbol);
 		}
 	}
@@ -515,6 +518,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 				String name = v.getId().toString();
 				VariableSymbol symbol = new VariableSymbol(name, type);
+				symbol.setDefinedLine(v.getBeginLine());
 				currentScope.define(symbol);
 			}
 
