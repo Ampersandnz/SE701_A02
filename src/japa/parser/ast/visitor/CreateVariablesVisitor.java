@@ -528,10 +528,16 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(IfStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 
 	@Override
 	public void visit(WhileStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 
 	@Override
@@ -544,10 +550,16 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ForeachStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 
 	@Override
 	public void visit(ForStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 
 	@Override
@@ -560,9 +572,15 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(TryStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 
 	@Override
 	public void visit(CatchClause n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		// TODO
 	}
 }

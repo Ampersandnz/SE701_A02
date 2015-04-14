@@ -94,8 +94,6 @@ public abstract class Node {
     }
 
     public <A> void accept(VoidVisitor<A> v, A arg) {
-		System.out.println("visiting node of type"
-				+ this.getClass().getSimpleName());
         v.visit(this, arg);
     }
 

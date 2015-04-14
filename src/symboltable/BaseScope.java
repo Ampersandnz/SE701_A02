@@ -8,7 +8,6 @@ public class BaseScope implements Scope  {
 	protected Scope enclosingScope = null;
 
 	public BaseScope() {
-		System.out.println("Created scope: " + this.getClass().getSimpleName());
 	}
 
 	@Override

@@ -216,6 +216,13 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(InitializerDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		if (n.getBlock() != null) {
+			n.getBlock().accept(this, arg);
+		}
+
+		currentScope = n.getEnclosingScope();
 	}
 
 	@Override
@@ -256,6 +263,8 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(AssignExpr n, Object arg) {
+
+		// TODO
 	}
 
 	@Override
@@ -324,6 +333,8 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(MethodCallExpr n, Object arg) {
+
+		// TODO
 	}
 
 	@Override
@@ -421,14 +432,24 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ReturnStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getExpr().accept(this, arg);
 	}
 
 	@Override
 	public void visit(IfStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getThenStmt().accept(this, arg);
+		n.getElseStmt().accept(this, arg);
 	}
 
 	@Override
 	public void visit(WhileStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getBody().accept(this, arg);
 	}
 
 	@Override
@@ -441,10 +462,16 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ForeachStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getBody().accept(this, arg);
 	}
 
 	@Override
 	public void visit(ForStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getBody().accept(this, arg);
 	}
 
 	@Override
@@ -457,9 +484,25 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(TryStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getTryBlock().accept(this, arg);
+
+		if (n.getCatchs() != null) {
+			for (CatchClause c : n.getCatchs()) {
+				c.accept(this, arg);
+			}
+		}
+
+		if (n.getFinallyBlock() != null) {
+			n.getFinallyBlock().accept(this, arg);
+		}
 	}
 
 	@Override
 	public void visit(CatchClause n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
+		n.getCatchBlock().accept(this, arg);
 	}
 }

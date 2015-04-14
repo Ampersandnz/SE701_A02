@@ -11,8 +11,6 @@ public abstract class ScopedSymbol extends Symbol implements Scope {
 
 	public ScopedSymbol(String name, Type type) {
 		super(name, type);
-		System.out.println("Created scopedSymbol: "
-				+ this.getClass().getSimpleName() + " (" + name + ")");
 	}
 
 	@Override

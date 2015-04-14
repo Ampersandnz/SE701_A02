@@ -96,7 +96,7 @@ import java.util.List;
  * @author Michael Lo
  */
 
-public final class VisitAllTemplate implements VoidVisitor<Object> {
+public final class PrintASTNodeNameVisitor implements VoidVisitor<Object> {
 
 	private void visitMembers(List<BodyDeclaration> members, Object arg) {
 		for (BodyDeclaration member : members) {
@@ -143,11 +143,13 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(Node n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         throw new IllegalStateException(n.getClass().getName());
     }
 
     @Override
 	public void visit(CompilationUnit n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getPakage() != null) {
             n.getPakage().accept(this, arg);
         }
@@ -165,25 +167,30 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(PackageDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
 		visitAnnotations(n.getAnnotations(), arg);
         n.getName().accept(this, arg);
     }
 
     @Override
 	public void visit(NameExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(QualifiedNameExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getQualifier().accept(this, arg);
     }
 
     @Override
 	public void visit(ImportDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -211,6 +218,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(EmptyTypeDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -218,10 +226,12 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(JavadocComment n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ClassOrInterfaceType n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
         }
@@ -230,6 +240,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(TypeParameter n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getTypeBound() != null) {
             for (Iterator<ClassOrInterfaceType> i = n.getTypeBound().iterator(); i.hasNext();) {
                 ClassOrInterfaceType c = i.next();
@@ -241,11 +252,13 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(ReferenceType n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getType().accept(this, arg);
     }
 
     @Override
 	public void visit(WildcardType n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getExtends() != null) {
             n.getExtends().accept(this, arg);
         }
@@ -256,6 +269,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(FieldDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -270,6 +284,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(VariableDeclarator n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getId().accept(this, arg);
         if (n.getInit() != null) {
             n.getInit().accept(this, arg);
@@ -278,12 +293,14 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(VariableDeclaratorId n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         for (int i = 0; i < n.getArrayCount(); i++) {
         }
     }
 
     @Override
 	public void visit(ArrayInitializerExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getValues() != null) {
             for (Iterator<Expression> i = n.getValues().iterator(); i.hasNext();) {
                 Expression expr = i.next();
@@ -294,16 +311,19 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(VoidType n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ArrayAccessExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getName().accept(this, arg);
         n.getIndex().accept(this, arg);
     }
 
     @Override
 	public void visit(ArrayCreationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getType().accept(this, arg);
 		visitTypeArgs(n.getTypeArgs(), arg);
 
@@ -322,6 +342,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(AssignExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getTarget().accept(this, arg);
 
         n.getValue().accept(this, arg);
@@ -329,6 +350,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(BinaryExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getLeft().accept(this, arg);
 
         n.getRight().accept(this, arg);
@@ -336,17 +358,20 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(CastExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getType().accept(this, arg);
         n.getExpr().accept(this, arg);
     }
 
     @Override
 	public void visit(ClassExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getType().accept(this, arg);
     }
 
     @Override
 	public void visit(ConditionalExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getCondition().accept(this, arg);
         n.getThenExpr().accept(this, arg);
         n.getElseExpr().accept(this, arg);
@@ -354,58 +379,71 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(EnclosedExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getInner().accept(this, arg);
     }
 
     @Override
 	public void visit(FieldAccessExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getScope().accept(this, arg);
     }
 
     @Override
 	public void visit(InstanceOfExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExpr().accept(this, arg);
         n.getType().accept(this, arg);
     }
 
     @Override
 	public void visit(CharLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(DoubleLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(IntegerLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(LongLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(IntegerLiteralMinValueExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(LongLiteralMinValueExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(StringLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(BooleanLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(NullLiteralExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ThisExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getClassExpr() != null) {
             n.getClassExpr().accept(this, arg);
         }
@@ -413,6 +451,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(SuperExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getClassExpr() != null) {
             n.getClassExpr().accept(this, arg);
         }
@@ -420,6 +459,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(MethodCallExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
         }
@@ -434,6 +474,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(ObjectCreationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
         }
@@ -455,15 +496,18 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(SuperMemberAccessExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(UnaryExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExpr().accept(this, arg);
     }
 
     @Override
 	public void visit(ConstructorDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -489,6 +533,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(MethodDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -518,6 +563,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(Parameter n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
 		visitAnnotations(n.getAnnotations(), arg);
 
         n.getType().accept(this, arg);
@@ -526,6 +572,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.isThis()) {
 			visitTypeArgs(n.getTypeArgs(), arg);
         } else {
@@ -544,6 +591,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
 		visitAnnotations(n.getAnnotations(), arg);
 
         n.getType().accept(this, arg);
@@ -556,11 +604,13 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(TypeDeclarationStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getTypeDeclaration().accept(this, arg);
     }
 
     @Override
 	public void visit(AssertStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getCheck().accept(this, arg);
         if (n.getMessage() != null) {
             n.getMessage().accept(this, arg);
@@ -569,6 +619,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(BlockStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getStmts() != null) {
             for (Statement s : n.getStmts()) {
                 s.accept(this, arg);
@@ -579,20 +630,24 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
     
     @Override
 	public void visit(LabeledStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getStmt().accept(this, arg);
     }
 
     @Override
 	public void visit(EmptyStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ExpressionStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExpression().accept(this, arg);
     }
 
     @Override
 	public void visit(SwitchStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getSelector().accept(this, arg);
         if (n.getEntries() != null) {
             for (SwitchEntryStmt e : n.getEntries()) {
@@ -604,6 +659,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(SwitchEntryStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getLabel() != null) {
             n.getLabel().accept(this, arg);
         }
@@ -618,10 +674,12 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(BreakStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(ReturnStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getExpr() != null) {
             n.getExpr().accept(this, arg);
         }
@@ -629,6 +687,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(EnumDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -653,6 +712,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(EnumConstantDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -672,6 +732,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(EmptyMemberDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -679,6 +740,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(InitializerDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -687,6 +749,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(IfStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getCondition().accept(this, arg);
         n.getThenStmt().accept(this, arg);
         if (n.getElseStmt() != null) {
@@ -696,22 +759,26 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(WhileStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getCondition().accept(this, arg);
         n.getBody().accept(this, arg);
     }
 
     @Override
 	public void visit(ContinueStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(DoStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getBody().accept(this, arg);
         n.getCondition().accept(this, arg);
     }
 
     @Override
 	public void visit(ForeachStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getVariable().accept(this, arg);
         n.getIterable().accept(this, arg);
         n.getBody().accept(this, arg);
@@ -719,6 +786,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(ForStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getInit() != null) {
             for (Iterator<Expression> i = n.getInit().iterator(); i.hasNext();) {
                 Expression e = i.next();
@@ -739,17 +807,20 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(ThrowStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExpr().accept(this, arg);
     }
 
     @Override
 	public void visit(SynchronizedStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExpr().accept(this, arg);
         n.getBlock().accept(this, arg);
     }
 
     @Override
 	public void visit(TryStmt n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getTryBlock().accept(this, arg);
         if (n.getCatchs() != null) {
             for (CatchClause c : n.getCatchs()) {
@@ -763,6 +834,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(CatchClause n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getExcept().accept(this, arg);
         n.getCatchBlock().accept(this, arg);
 
@@ -770,6 +842,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(AnnotationDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -782,6 +855,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(AnnotationMemberDeclaration n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -795,17 +869,20 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(MarkerAnnotationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getName().accept(this, arg);
     }
 
     @Override
 	public void visit(SingleMemberAnnotationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getName().accept(this, arg);
         n.getMemberValue().accept(this, arg);
     }
 
     @Override
 	public void visit(NormalAnnotationExpr n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getName().accept(this, arg);
         for (Iterator<MemberValuePair> i = n.getPairs().iterator(); i.hasNext();) {
             MemberValuePair m = i.next();
@@ -815,22 +892,27 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(MemberValuePair n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
         n.getValue().accept(this, arg);
     }
 
     @Override
 	public void visit(LineComment n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
 	public void visit(BlockComment n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
     @Override
     public void visit(FileStmt n, Object arg) {
+    	System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
 	@Override
 	public void visit(PrimitiveType n, Object arg) {
+		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
 	}
 }
