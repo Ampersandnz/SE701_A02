@@ -28,7 +28,8 @@ public class LocalScope extends BaseScope {
 		String name = symbol.getName();
 		if (this.resolve(name) != null) {
 			throw new A2SemanticsException("\"" + name
-					+ "\" is already defined in scope " + getScopeName());
+					+ "\" is already defined in scope " + getScopeName()
+					+ "! (On line " + symbol.getDefinedLine() + ")");
 		}
 		symbols.put(name, symbol);
 	}

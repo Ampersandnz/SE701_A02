@@ -4,6 +4,7 @@ public abstract class Symbol {
 
 	protected String name;
 	protected Type type;
+	private int definedLine = -1;
 	
 	public Symbol(String name, Type type) {
 		this.name = name;
@@ -16,5 +17,13 @@ public abstract class Symbol {
 	
 	public Type getType() {
 		return type;
+	}
+
+	public int getDefinedLine() {
+		return definedLine;
+	}
+
+	public void setDefinedLine(int definedLine) {
+		this.definedLine = definedLine;
 	}
 }

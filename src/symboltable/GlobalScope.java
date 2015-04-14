@@ -14,11 +14,9 @@ public class GlobalScope extends BaseScope {
 		define(new BuiltInTypeSymbol("byte"));
 		define(new BuiltInTypeSymbol("short"));
 		define(new BuiltInTypeSymbol("char"));
-
+		define(new BuiltInTypeSymbol("String"));
 		define(new BuiltInTypeSymbol("void"));
 		define(new BuiltInTypeSymbol("null"));
-
-		define(new ClassSymbol("String"));
 	}
 	
 	@Override

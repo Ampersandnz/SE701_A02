@@ -36,7 +36,6 @@ import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.ConditionalExpr;
 import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.EnclosedExpr;
-import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.InstanceOfExpr;
 import japa.parser.ast.expr.IntegerLiteralExpr;
@@ -89,18 +88,13 @@ import japa.parser.ast.type.WildcardType;
 
 import java.util.Iterator;
 
-import se701.A2SemanticsException;
-import symboltable.MethodSymbol;
 import symboltable.Scope;
-import symboltable.Symbol;
-import symboltable.Type;
-import symboltable.VariableSymbol;
 
 /**
  * @author Michael Lo
  */
 
-public class CreateVariablesVisitor implements VoidVisitor<Object> {
+public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	private Scope currentScope;
 
@@ -148,7 +142,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
-		
+
 		if (n.getMembers() != null) {
 			for (BodyDeclaration b : n.getMembers()) {
 				b.accept(this, arg);
@@ -180,24 +174,6 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(FieldDeclaration n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
-		for (VariableDeclarator v : n.getVariables()) {
-			Symbol resolved = currentScope.resolve(n.getType().toString());
-			Type type = null;
-
-			if (resolved instanceof Type) {
-				type = (Type) resolved;
-			} else {
-				throw new A2SemanticsException(resolved.getName()
-						+ " is not a type! Is a " + resolved.getClass().getName());
-			}
-
-			String name = v.getId().toString();
-			VariableSymbol symbol = new VariableSymbol(name, type);
-			symbol.setDefinedLine(v.getBeginLine());
-			currentScope.define(symbol);
-		}
 	}
 
 	@Override
@@ -212,56 +188,22 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 	public void visit(ConstructorDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
 
-		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
-
-			if (n.getBlock() != null) {
-				n.getBlock().accept(this, arg);
-			}
-		} else {
-			throw new A2SemanticsException(
-					"Scope of MethodDeclaration not a MethodSymbol! (is a "
-							+ currentScope.getClass().getName() + ")");
+		if (n.getBlock() != null) {
+			n.getBlock().accept(this, arg);
 		}
+
 		currentScope = n.getEnclosingScope();
 	}
 
 	@Override
 	public void visit(MethodDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
-
-		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
-
-			if (n.getBody() != null) {
-				n.getBody().accept(this, arg);
-			}
-		} else {
-			throw new A2SemanticsException(
-					"Scope of MethodDeclaration not a MethodSymbol! (is a "
-							+ currentScope.getClass().getName() + ")");
+		
+		if (n.getBody() != null) {
+			n.getBody().accept(this, arg);
 		}
+
 		currentScope = n.getEnclosingScope();
-
-		if (n.getParameters() != null) {
-			for (Parameter p : n.getParameters()) {
-				Symbol resolved = currentScope.resolve(p.getType().toString());
-				Type type = null;
-
-				if (resolved instanceof Type) {
-					type = (Type) resolved;
-				} else {
-					throw new A2SemanticsException(resolved.getName()
-							+ " is not a type! Is a "
-							+ resolved.getClass().getName());
-				}
-
-				String name = p.getId().toString();
-				VariableSymbol symbol = new VariableSymbol(name, type);
-				symbol.setDefinedLine(p.getBeginLine());
-				currentScope.define(symbol);
-			}
-		}
 	}
 
 	@Override
@@ -414,25 +356,6 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
-		for (VariableDeclarator v : n.getVars()) {
-			Symbol resolved = currentScope.resolve(n.getType().toString());
-			Type type = null;
-
-			if (resolved instanceof Type) {
-				type = (Type) resolved;
-			} else {
-				throw new A2SemanticsException(resolved.getName()
-						+ " is not a type! Is a "
-						+ resolved.getClass().getName());
-			}
-
-			String name = v.getId().toString();
-			VariableSymbol symbol = new VariableSymbol(name, type);
-			symbol.setDefinedLine(v.getBeginLine());
-			currentScope.define(symbol);
-		}
 	}
 
 	@Override
@@ -482,32 +405,6 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ExpressionStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-		
-		Expression e = n.getExpression();
-
-		if (e instanceof VariableDeclarationExpr) {
-			VariableDeclarationExpr d = (VariableDeclarationExpr) e;
-
-			for (VariableDeclarator v : d.getVars()) {
-				Symbol resolved = currentScope.resolve(d.getType().toString());
-				Type type = null;
-
-				if (resolved instanceof Type) {
-					type = (Type) resolved;
-				} else {
-					throw new A2SemanticsException(resolved.getName()
-							+ " is not a type! Is a "
-							+ resolved.getClass().getName());
-				}
-
-				String name = v.getId().toString();
-				VariableSymbol symbol = new VariableSymbol(name, type);
-				symbol.setDefinedLine(v.getBeginLine());
-				currentScope.define(symbol);
-			}
-
-		}
 	}
 
 	@Override

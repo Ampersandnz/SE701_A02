@@ -3,6 +3,7 @@ package se701;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.visitor.CheckVariableUseVisitor;
 import japa.parser.ast.visitor.CreateScopesVisitor;
 import japa.parser.ast.visitor.CreateTypesVisitor;
 import japa.parser.ast.visitor.CreateVariablesVisitor;
@@ -36,6 +37,20 @@ public class A2Compiler {
 		CreateVariablesVisitor createVariables = new CreateVariablesVisitor();
 		ast.accept(createVariables, null);
 
+		// Check that all variables have been accessed only after their
+		// creation, and that any assignments are of the correct type.
+		CheckVariableUseVisitor checkVariables = new CheckVariableUseVisitor();
+		ast.accept(checkVariables, null);
+
+		/*
+		 * // Check that all method calls are to methods that exist, and pass in
+		 * // the correct type for each parameter. CheckMethodCallsVisitor
+		 * checkMethods = new CheckMethodCallsVisitor();
+		 * ast.accept(checkMethods, null);
+		 */
+
+		// Print the output .java file. Other than my additional feature, should
+		// be identical to the input .javax file.
 		DumpVisitor printVisitor = new DumpVisitor();
 		ast.accept(printVisitor, null);
 		

@@ -90,8 +90,6 @@ import japa.parser.ast.type.WildcardType;
 import java.util.Iterator;
 
 import se701.A2SemanticsException;
-import symboltable.ClassSymbol;
-import symboltable.InterfaceSymbol;
 import symboltable.MethodSymbol;
 import symboltable.Scope;
 import symboltable.Symbol;
@@ -151,25 +149,12 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
 		
-		if (currentScope instanceof ClassSymbol) {
-
-			if (n.getMembers() != null) {
-				for (BodyDeclaration b : n.getMembers()) {
-					b.accept(this, arg);
-				}
+		if (n.getMembers() != null) {
+			for (BodyDeclaration b : n.getMembers()) {
+				b.accept(this, arg);
 			}
-		} else if (currentScope instanceof InterfaceSymbol) {
-
-			if (n.getMembers() != null) {
-				for (BodyDeclaration b : n.getMembers()) {
-					b.accept(this, arg);
-				}
-			}
-		} else {
-			throw new A2SemanticsException(
-					"Scope of ClassOrInterfaceDeclaration not a ClassSymbol or an InterfaceSymbol! (is a "
-							+ currentScope.getClass().getName() + ")");
 		}
+
 		currentScope = n.getEnclosingScope();
 	}
 
