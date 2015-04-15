@@ -1,6 +1,8 @@
 package symboltable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import se701.A2SemanticsException;
 
@@ -69,5 +71,30 @@ public abstract class ScopedSymbol extends Symbol implements Scope {
 
 		// otherwise it doesn't exist
 		return null;
+	}
+
+	@Override
+	public List<Symbol> getAllSymbols() {
+		List<Symbol> allSymbols = new ArrayList<Symbol>();
+
+		for (String key : symbols.keySet()) {
+			allSymbols.add(symbols.get(key));
+		}
+
+		if (enclosingScope != null) {
+			allSymbols.addAll(enclosingScope.getAllSymbols());
+		}
+
+		return allSymbols;
+	}
+
+	@Override
+	public void printScopeHierarchy() {
+		Scope s = this;
+
+		while (s != null) {
+			System.out.println(s.getScopeName());
+			s = s.getEnclosingScope();
+		}
 	}
 }

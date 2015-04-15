@@ -1,6 +1,5 @@
 package symboltable;
 
-import se701.A2SemanticsException;
 
 public class GlobalScope extends BaseScope {
 	
@@ -36,49 +35,5 @@ public class GlobalScope extends BaseScope {
 	public void setEnclosingScope(Scope scope) {
 		throw new IllegalArgumentException(
 				"GlobalScope cannot have an enclosing scope!");
-	}
-
-	@Override
-	public void define(Symbol symbol) {
-		String name = symbol.getName();
-
-		if (this.resolve(name) != null) {
-			throw new A2SemanticsException("\"" + name
-					+ "\" is already defined in scope " + getScopeName());
-		}
-		symbols.put(name, symbol);
-	}
-
-	@Override
-	public Symbol resolve(String name) {
-		// if the symbol exists in the current scope, return it
-		Symbol s = symbols.get(name);
-		if (s != null)
-			return s;
-
-		// otherwise look in the enclosing scope, if there is one
-		if (enclosingScope != null)
-			return enclosingScope.resolve(name);
-
-		// otherwise it doesn't exist
-		return null;
-	}
-
-	@Override
-	public Type resolveType(String name) {
-		// if the symbol exists in the current scope, return it
-		Symbol s = symbols.get(name);
-		if (s != null) {
-			if (s instanceof Type) {
-				return (Type) s;
-			}
-		}
-
-		// otherwise look in the enclosing scope, if there is one
-		if (enclosingScope != null)
-			return enclosingScope.resolveType(name);
-
-		// otherwise it doesn't exist
-		return null;
 	}
 }

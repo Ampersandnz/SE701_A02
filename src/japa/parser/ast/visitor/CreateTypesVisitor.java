@@ -123,6 +123,8 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(CompilationUnit n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getPakage() != null) {
 			n.getPakage().accept(this, arg);
 		}
@@ -185,6 +187,8 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 			// Define the class/interface in the scope above it.
 			n.getEnclosingScope().getEnclosingScope().define(interfaceSymbol);
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -465,6 +469,7 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(MethodDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -490,6 +495,7 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 		if (n.getBody() != null) {
 			n.getBody().accept(this, arg);
 		}
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -540,12 +546,14 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(BlockStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
 		if (n.getStmts() != null) {
 			for (Statement s : n.getStmts()) {
 				s.accept(this, arg);
 			}
 		}
 
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -626,6 +634,8 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(EnumConstantDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -640,6 +650,8 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 		if (n.getClassBody() != null) {
 			visitMembers(n.getClassBody(), arg);
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -651,10 +663,14 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(InitializerDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
 		n.getBlock().accept(this, arg);
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override

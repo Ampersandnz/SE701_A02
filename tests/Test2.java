@@ -1,10 +1,12 @@
 public class Test2 {
 
-    public void foo(boolean x) {
-        b = 123;
+    public void yo(boolean x) {
+        int a;
+        a = sup();
+        System.out.println(x);
     }
 
-    public void bar() {
-        int b = 456;
+    public String sup() {
+        return "Hello, world!";
     }
 }

@@ -25,6 +25,13 @@ public class A2Compiler {
 		JavaParser parser = new JavaParser(new FileReader(file));
 		CompilationUnit ast = parser.CompilationUnit();
 
+		// Visitor that (should) visit every node in the AST and print its class
+		// name.
+		// TODO: For debugging purposes only, remove before completion.
+		// PrintASTNodeNameVisitor printASTNodeNameVisitor = new
+		// PrintASTNodeNameVisitor();
+		// ast.accept(printASTNodeNameVisitor, null);
+
 		// Create scopes
 		CreateScopesVisitor createScopes = new CreateScopesVisitor();
 		ast.accept(createScopes, null);
@@ -48,13 +55,6 @@ public class A2Compiler {
 		 * checkMethods = new CheckMethodCallsVisitor();
 		 * ast.accept(checkMethods, null);
 		 */
-
-		// Visitor that (should) visit every node in the AST and print its class
-		// name.
-		// TODO: For debugging purposes only, remove before completion.
-		// PrintASTNodeNameVisitor printASTNodeNameVisitor = new
-		// PrintASTNodeNameVisitor();
-		// ast.accept(printASTNodeNameVisitor, null);
 
 		// Print the output .java file. Other than my additional feature, should
 		// be identical to the input .javax file.

@@ -148,7 +148,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 			}
 		}
 
-		currentScope = n.getEnclosingScope();
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -173,7 +173,6 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(FieldDeclaration n, Object arg) {
-		// TODO: If initialised in declaration, check that value is valid
 	}
 
 	@Override
@@ -203,7 +202,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 			n.getBody().accept(this, arg);
 		}
 
-		currentScope = n.getEnclosingScope();
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -222,7 +221,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 			n.getBlock().accept(this, arg);
 		}
 
-		currentScope = n.getEnclosingScope();
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -345,21 +344,20 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 									+ target.getType().getName() + ") on line "
 									+ n.getBeginLine() + ".");
 				}
+			} else if (expr instanceof MethodCallExpr) {
+
+				// TODO check that return type of function is correct for this
+				// variable
+
+			} else if (expr instanceof ArrayAccessExpr) {
+				// TODO
+			} else if (expr instanceof ArrayCreationExpr) {
+				// TODO
+			} else if (expr instanceof CastExpr) {
+				// TODO
+			} else if (expr instanceof ClassExpr) {
+				// TODO
 			}
-				
-			
-			// TODO: Primitive type
-			// TODO: Array access
-			// TODO: Array creation
-			// TODO: Cast
-			// TODO: Class
-			// TODO: Literal
-			// if (something != target.getType()) {
-			// throw new A2SemanticsException(somethingType
-			// + " is not a valid type for variable "
-			// + target.getName() + " (on line " + n.getBeginLine()
-			// + ").");
-			// }
 			break;
 		case plus: // +=
 			break;
@@ -452,8 +450,6 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(MethodCallExpr n, Object arg) {
-
-		// TODO
 	}
 
 	@Override
@@ -486,6 +482,8 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
+		// TODO: Separate AssignExpr contents into subfunctions to avoid code
+		// duplication.
 	}
 
 	@Override
@@ -523,6 +521,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		for (Statement s : n.getStmts()) {
 			s.accept(this, arg);
 		}
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override

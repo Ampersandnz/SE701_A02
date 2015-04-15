@@ -126,6 +126,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(CompilationUnit n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getPakage() != null) {
 			n.getPakage().accept(this, arg);
 		}
@@ -162,6 +164,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -186,6 +190,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 		if (n.getMembers() != null) {
 			visitMembers(n.getMembers(), arg);
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -488,27 +494,18 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 							+ currentScope.getClass().getName() + ")");
 		}
 
-		currentScope = n.getEnclosingScope();
-
 		if (n.getParameters() != null) {
 			for (Parameter p : n.getParameters()) {
-				Symbol resolved = currentScope.resolve(p.getType().toString());
-				Type type = null;
+				Type type = currentScope.resolveType(p.getType().toString());
 
-				if (resolved instanceof Type) {
-					type = (Type) resolved;
-				} else {
-					throw new A2SemanticsException(resolved.getName()
-							+ " is not a type! Is a "
-							+ resolved.getClass().getName());
-				}
-
-				String name = p.getId().toString();
+				String name = p.getId().getName();
 				VariableSymbol symbol = new VariableSymbol(name, type);
 				symbol.setDefinedLine(p.getBeginLine());
 				currentScope.define(symbol);
 			}
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -579,12 +576,15 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(BlockStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getStmts() != null) {
 			for (Statement s : n.getStmts()) {
 				s.accept(this, arg);
 			}
 		}
 
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -665,6 +665,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(EnumConstantDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -679,6 +681,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 		if (n.getClassBody() != null) {
 			visitMembers(n.getClassBody(), arg);
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -690,10 +694,14 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(InitializerDeclaration n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
 		n.getBlock().accept(this, arg);
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override

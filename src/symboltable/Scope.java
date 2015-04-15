@@ -1,5 +1,7 @@
 package symboltable;
 
+import java.util.List;
+
 public interface Scope {
 	public String getScopeName();
 	public Scope getEnclosingScope();
@@ -7,4 +9,6 @@ public interface Scope {
 	public void define(Symbol symbol);
 	public Symbol resolve(String name);
 	public Type resolveType(String name);
+	public List<Symbol> getAllSymbols();
+	public void printScopeHierarchy();
 }

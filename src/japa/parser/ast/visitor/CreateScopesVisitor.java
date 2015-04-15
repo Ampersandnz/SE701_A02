@@ -320,20 +320,14 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 	public void visit(MethodDeclaration n, Object arg) {
 		MethodSymbol methodSymbol = new MethodSymbol(n.getName());
 		methodSymbol.setEnclosingScope(currentScope);
-
-		Symbol returnSymbol = currentScope.resolve(n.getType().toString());
-
-		if (returnSymbol instanceof Type) {
-			Type returnType = (Type) returnSymbol;
-			methodSymbol.setReturnType(returnType);
-		} else {
-			throw new A2SemanticsException("Return type of method/constructor "
-					+ n.getName() + " is not a Type! (is "
-					+ returnSymbol.getName() + ")");
-		}
-
 		currentScope = methodSymbol;
 		n.setEnclosingScope(currentScope);
+
+		Type returnType = currentScope.resolveType(n.getType().toString());
+
+		methodSymbol.setReturnType(returnType);
+
+		currentScope.getEnclosingScope().define(methodSymbol);
 
 		if (n.getParameters() != null) {
 			for (Iterator<Parameter> i = n.getParameters().iterator(); i

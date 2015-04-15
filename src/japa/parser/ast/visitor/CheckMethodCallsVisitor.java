@@ -150,7 +150,7 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 			}
 		}
 
-		currentScope = n.getEnclosingScope();
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -234,7 +234,6 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 					"Scope of MethodDeclaration not a MethodSymbol! (is a "
 							+ currentScope.getClass().getName() + ")");
 		}
-		currentScope = n.getEnclosingScope();
 
 		if (n.getParameters() != null) {
 			for (Parameter p : n.getParameters()) {
@@ -255,6 +254,8 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 				currentScope.define(symbol);
 			}
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -463,6 +464,7 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 		for (Statement s : n.getStmts()) {
 			s.accept(this, arg);
 		}
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
