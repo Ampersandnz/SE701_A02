@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -85,7 +85,6 @@ import japa.parser.ast.stmt.DoStmt;
 import japa.parser.ast.stmt.EmptyStmt;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
-import japa.parser.ast.stmt.FileStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -114,8 +113,6 @@ public interface VoidVisitor<A> {
     //- Compilation Unit ----------------------------------
 
     public void visit(CompilationUnit n, A arg);
-
-	public void visit(FileStmt n, A arg);
 
     public void visit(PackageDeclaration n, A arg);
 

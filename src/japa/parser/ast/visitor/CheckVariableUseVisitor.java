@@ -37,6 +37,7 @@ import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.expr.ConditionalExpr;
 import japa.parser.ast.expr.DoubleLiteralExpr;
 import japa.parser.ast.expr.EnclosedExpr;
+import japa.parser.ast.expr.Expression;
 import japa.parser.ast.expr.FieldAccessExpr;
 import japa.parser.ast.expr.InstanceOfExpr;
 import japa.parser.ast.expr.IntegerLiteralExpr;
@@ -67,7 +68,6 @@ import japa.parser.ast.stmt.DoStmt;
 import japa.parser.ast.stmt.EmptyStmt;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
-import japa.parser.ast.stmt.FileStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -116,10 +116,6 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 				i.next().accept(this, arg);
 			}
 		}
-	}
-
-	@Override
-	public void visit(FileStmt n, Object arg) {
 	}
 
 	@Override
@@ -285,18 +281,85 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		}
 
 		Operator operator = n.getOperator();
+		String t = target.getType().getName();
 
 		switch(operator) {
 		case assign: // =
+			Expression expr = n.getValue();
 
-			// TODO: MethodCallExpr
+			if (expr instanceof BooleanLiteralExpr) {
+				if (t != "boolean") {
+					throw new A2SemanticsException(
+							"boolean is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof NullLiteralExpr) {
+				if (t == "int" || t == "byte" || t == "short" || t == "long"
+						|| t == "double" || t == "float" || t == "boolean"
+						|| t == "char") {
+					throw new A2SemanticsException("Primitive variable "
+							+ target.getName() + " ("
+							+ target.getType().getName()
+							+ ") cannot be set to null on line "
+							+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof CharLiteralExpr) {
+				if (t != "char") {
+					throw new A2SemanticsException(
+							"char is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof DoubleLiteralExpr) {
+				if (t != "double") {
+					throw new A2SemanticsException(
+							"double is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof IntegerLiteralExpr) {
+				if (t != "int") {
+					throw new A2SemanticsException(
+							"int is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof LongLiteralExpr) {
+				if (t != "long") {
+					throw new A2SemanticsException(
+							"long is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof StringLiteralExpr) {
+				if (t != "String") {
+					throw new A2SemanticsException(
+							"String is not a valid type for variable "
+									+ target.getName() + " ("
+									+ target.getType().getName() + ") on line "
+									+ n.getBeginLine() + ".");
+				}
+			}
+				
+			
 			// TODO: Primitive type
 			// TODO: Array access
 			// TODO: Array creation
 			// TODO: Cast
 			// TODO: Class
 			// TODO: Literal
-			// n.getValue()
+			// if (something != target.getType()) {
+			// throw new A2SemanticsException(somethingType
+			// + " is not a valid type for variable "
+			// + target.getName() + " (on line " + n.getBeginLine()
+			// + ").");
+			// }
 			break;
 		case plus: // +=
 			break;

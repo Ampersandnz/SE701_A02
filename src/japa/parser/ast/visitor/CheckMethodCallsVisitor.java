@@ -67,7 +67,6 @@ import japa.parser.ast.stmt.DoStmt;
 import japa.parser.ast.stmt.EmptyStmt;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
-import japa.parser.ast.stmt.FileStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -119,10 +118,6 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 				i.next().accept(this, arg);
 			}
 		}
-	}
-
-	@Override
-	public void visit(FileStmt n, Object arg) {
 	}
 
 	@Override
@@ -213,7 +208,6 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 		currentScope = n.getEnclosingScope();
 
 		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
 
 			if (n.getBlock() != null) {
 				n.getBlock().accept(this, arg);
@@ -231,7 +225,6 @@ public class CheckMethodCallsVisitor implements VoidVisitor<Object> {
 		currentScope = n.getEnclosingScope();
 
 		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
 
 			if (n.getBody() != null) {
 				n.getBody().accept(this, arg);

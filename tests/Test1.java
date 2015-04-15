@@ -3,7 +3,7 @@ public class Test1 {
     int a;
 
     public void foo(boolean x) {
-        a = false;
+        a = 12;
         break;
     }
 }

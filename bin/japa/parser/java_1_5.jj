@@ -241,7 +241,6 @@ TOKEN :
 | < NATIVE: "native" >
 | < NEW: "new" >
 | < NULL: "null" >
-| < OPENFILE: "openfile" >
 | < PACKAGE: "package">
 | < PRIVATE: "private" >
 | < PROTECTED: "protected" >
@@ -2377,8 +2376,6 @@ Statement Statement():
 	|
 	  ret = Block()
 	|
-	  ret = OpenFile()
-	|
 	  ret = EmptyStatement()
 	|
 	  ret = StatementExpression()
@@ -2445,26 +2442,6 @@ BlockStmt Block():
   	stmts = Statements() 
   "}" {endLine=token.beginLine; endColumn=token.beginColumn;}
   { return new BlockStmt(beginLine, beginColumn, endLine, endColumn, stmts); }
-}
-
-
-FileStmt OpenFile():
-{
-	List stmts;
-	int beginLine;
-	int beginColumn;
-	int endLine;
-	int endColumn;
-	String filename;
-	boolean read;
-	boolean write;
-}
-{
-  < OPENFILE > "{" {beginLine=token.beginLine; beginColumn=token.beginColumn;}
-  	< STRING_LITERAL > { filename = token.image; }  	(< READ > { read = true; write = false; } | < WRITE > { read = false; write = true; })
-  	stmts = Statements() 
-  "}" {endLine=token.beginLine; endColumn=token.beginColumn;}
-  { return new FileStmt(beginLine, beginColumn, endLine, endColumn, stmts, filename, read, write); }
 }
 
 /*

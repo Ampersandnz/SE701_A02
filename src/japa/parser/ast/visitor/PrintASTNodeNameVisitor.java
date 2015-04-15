@@ -68,7 +68,6 @@ import japa.parser.ast.stmt.DoStmt;
 import japa.parser.ast.stmt.EmptyStmt;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
-import japa.parser.ast.stmt.FileStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -904,11 +903,6 @@ public final class PrintASTNodeNameVisitor implements VoidVisitor<Object> {
     @Override
 	public void visit(BlockComment n, Object arg) {
 		System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
-    }
-
-    @Override
-    public void visit(FileStmt n, Object arg) {
-    	System.out.println("Visited node " + n.toString() + " (" + n.getClass().getSimpleName() + ").");
     }
 
 	@Override

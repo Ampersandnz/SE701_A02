@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -90,7 +90,6 @@ import japa.parser.ast.stmt.DoStmt;
 import japa.parser.ast.stmt.EmptyStmt;
 import japa.parser.ast.stmt.ExplicitConstructorInvocationStmt;
 import japa.parser.ast.stmt.ExpressionStmt;
-import japa.parser.ast.stmt.FileStmt;
 import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
@@ -216,11 +215,13 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(Node n, Object arg) {
+    @Override
+	public void visit(Node n, Object arg) {
         throw new IllegalStateException(n.getClass().getName());
     }
 
-    public void visit(CompilationUnit n, Object arg) {
+    @Override
+	public void visit(CompilationUnit n, Object arg) {
         if (n.getPakage() != null) {
             n.getPakage().accept(this, arg);
         }
@@ -241,7 +242,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(PackageDeclaration n, Object arg) {
+    @Override
+	public void visit(PackageDeclaration n, Object arg) {
         printAnnotations(n.getAnnotations(), arg);
         printer.print("package ");
         n.getName().accept(this, arg);
@@ -249,17 +251,20 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn();
     }
 
-    public void visit(NameExpr n, Object arg) {
+    @Override
+	public void visit(NameExpr n, Object arg) {
         printer.print(n.getName());
     }
 
-    public void visit(QualifiedNameExpr n, Object arg) {
+    @Override
+	public void visit(QualifiedNameExpr n, Object arg) {
         n.getQualifier().accept(this, arg);
         printer.print(".");
         printer.print(n.getName());
     }
 
-    public void visit(ImportDeclaration n, Object arg) {
+    @Override
+	public void visit(ImportDeclaration n, Object arg) {
         printer.print("import ");
         if (n.isStatic()) {
             printer.print("static ");
@@ -271,7 +276,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn(";");
     }
 
-    public void visit(ClassOrInterfaceDeclaration n, Object arg) {
+    @Override
+	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -319,20 +325,23 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("}");
     }
 
-    public void visit(EmptyTypeDeclaration n, Object arg) {
+    @Override
+	public void visit(EmptyTypeDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
         printer.print(";");
     }
 
-    public void visit(JavadocComment n, Object arg) {
+    @Override
+	public void visit(JavadocComment n, Object arg) {
         printer.print("/**");
         printer.print(n.getContent());
         printer.printLn("*/");
     }
 
-    public void visit(ClassOrInterfaceType n, Object arg) {
+    @Override
+	public void visit(ClassOrInterfaceType n, Object arg) {
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
             printer.print(".");
@@ -341,7 +350,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printTypeArgs(n.getTypeArgs(), arg);
     }
 
-    public void visit(TypeParameter n, Object arg) {
+    @Override
+	public void visit(TypeParameter n, Object arg) {
         printer.print(n.getName());
         if (n.getTypeBound() != null) {
             printer.print(" extends ");
@@ -355,7 +365,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(PrimitiveType n, Object arg) {
+    @Override
+	public void visit(PrimitiveType n, Object arg) {
         switch (n.getType()) {
             case Boolean:
                 printer.print("boolean");
@@ -384,14 +395,16 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(ReferenceType n, Object arg) {
+    @Override
+	public void visit(ReferenceType n, Object arg) {
         n.getType().accept(this, arg);
         for (int i = 0; i < n.getArrayCount(); i++) {
             printer.print("[]");
         }
     }
 
-    public void visit(WildcardType n, Object arg) {
+    @Override
+	public void visit(WildcardType n, Object arg) {
         printer.print("?");
         if (n.getExtends() != null) {
             printer.print(" extends ");
@@ -403,7 +416,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(FieldDeclaration n, Object arg) {
+    @Override
+	public void visit(FieldDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -423,7 +437,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(VariableDeclarator n, Object arg) {
+    @Override
+	public void visit(VariableDeclarator n, Object arg) {
         n.getId().accept(this, arg);
         if (n.getInit() != null) {
             printer.print(" = ");
@@ -431,14 +446,16 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(VariableDeclaratorId n, Object arg) {
+    @Override
+	public void visit(VariableDeclaratorId n, Object arg) {
         printer.print(n.getName());
         for (int i = 0; i < n.getArrayCount(); i++) {
             printer.print("[]");
         }
     }
 
-    public void visit(ArrayInitializerExpr n, Object arg) {
+    @Override
+	public void visit(ArrayInitializerExpr n, Object arg) {
         printer.print("{");
         if (n.getValues() != null) {
             printer.print(" ");
@@ -454,18 +471,21 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("}");
     }
 
-    public void visit(VoidType n, Object arg) {
+    @Override
+	public void visit(VoidType n, Object arg) {
         printer.print("void");
     }
 
-    public void visit(ArrayAccessExpr n, Object arg) {
+    @Override
+	public void visit(ArrayAccessExpr n, Object arg) {
         n.getName().accept(this, arg);
         printer.print("[");
         n.getIndex().accept(this, arg);
         printer.print("]");
     }
 
-    public void visit(ArrayCreationExpr n, Object arg) {
+    @Override
+	public void visit(ArrayCreationExpr n, Object arg) {
         printer.print("new ");
         n.getType().accept(this, arg);
         printTypeArgs(n.getTypeArgs(), arg);
@@ -488,7 +508,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(AssignExpr n, Object arg) {
+    @Override
+	public void visit(AssignExpr n, Object arg) {
         n.getTarget().accept(this, arg);
         printer.print(" ");
         switch (n.getOperator()) {
@@ -533,7 +554,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getValue().accept(this, arg);
     }
 
-    public void visit(BinaryExpr n, Object arg) {
+    @Override
+	public void visit(BinaryExpr n, Object arg) {
         n.getLeft().accept(this, arg);
         printer.print(" ");
         switch (n.getOperator()) {
@@ -599,19 +621,22 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getRight().accept(this, arg);
     }
 
-    public void visit(CastExpr n, Object arg) {
+    @Override
+	public void visit(CastExpr n, Object arg) {
         printer.print("(");
         n.getType().accept(this, arg);
         printer.print(") ");
         n.getExpr().accept(this, arg);
     }
 
-    public void visit(ClassExpr n, Object arg) {
+    @Override
+	public void visit(ClassExpr n, Object arg) {
         n.getType().accept(this, arg);
         printer.print(".class");
     }
 
-    public void visit(ConditionalExpr n, Object arg) {
+    @Override
+	public void visit(ConditionalExpr n, Object arg) {
         n.getCondition().accept(this, arg);
         printer.print(" ? ");
         n.getThenExpr().accept(this, arg);
@@ -619,65 +644,78 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getElseExpr().accept(this, arg);
     }
 
-    public void visit(EnclosedExpr n, Object arg) {
+    @Override
+	public void visit(EnclosedExpr n, Object arg) {
         printer.print("(");
         n.getInner().accept(this, arg);
         printer.print(")");
     }
 
-    public void visit(FieldAccessExpr n, Object arg) {
+    @Override
+	public void visit(FieldAccessExpr n, Object arg) {
         n.getScope().accept(this, arg);
         printer.print(".");
         printer.print(n.getField());
     }
 
-    public void visit(InstanceOfExpr n, Object arg) {
+    @Override
+	public void visit(InstanceOfExpr n, Object arg) {
         n.getExpr().accept(this, arg);
         printer.print(" instanceof ");
         n.getType().accept(this, arg);
     }
 
-    public void visit(CharLiteralExpr n, Object arg) {
+    @Override
+	public void visit(CharLiteralExpr n, Object arg) {
         printer.print("'");
         printer.print(n.getValue());
         printer.print("'");
     }
 
-    public void visit(DoubleLiteralExpr n, Object arg) {
+    @Override
+	public void visit(DoubleLiteralExpr n, Object arg) {
         printer.print(n.getValue());
     }
 
-    public void visit(IntegerLiteralExpr n, Object arg) {
+    @Override
+	public void visit(IntegerLiteralExpr n, Object arg) {
         printer.print(n.getValue());
     }
 
-    public void visit(LongLiteralExpr n, Object arg) {
+    @Override
+	public void visit(LongLiteralExpr n, Object arg) {
         printer.print(n.getValue());
     }
 
-    public void visit(IntegerLiteralMinValueExpr n, Object arg) {
+    @Override
+	public void visit(IntegerLiteralMinValueExpr n, Object arg) {
         printer.print(n.getValue());
     }
 
-    public void visit(LongLiteralMinValueExpr n, Object arg) {
+    @Override
+	public void visit(LongLiteralMinValueExpr n, Object arg) {
         printer.print(n.getValue());
     }
 
-    public void visit(StringLiteralExpr n, Object arg) {
+    @Override
+	public void visit(StringLiteralExpr n, Object arg) {
         printer.print("\"");
         printer.print(n.getValue());
         printer.print("\"");
     }
 
-    public void visit(BooleanLiteralExpr n, Object arg) {
+    @Override
+	public void visit(BooleanLiteralExpr n, Object arg) {
         printer.print(n.getValue().toString());
     }
 
-    public void visit(NullLiteralExpr n, Object arg) {
+    @Override
+	public void visit(NullLiteralExpr n, Object arg) {
         printer.print("null");
     }
 
-    public void visit(ThisExpr n, Object arg) {
+    @Override
+	public void visit(ThisExpr n, Object arg) {
         if (n.getClassExpr() != null) {
             n.getClassExpr().accept(this, arg);
             printer.print(".");
@@ -685,7 +723,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("this");
     }
 
-    public void visit(SuperExpr n, Object arg) {
+    @Override
+	public void visit(SuperExpr n, Object arg) {
         if (n.getClassExpr() != null) {
             n.getClassExpr().accept(this, arg);
             printer.print(".");
@@ -693,7 +732,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("super");
     }
 
-    public void visit(MethodCallExpr n, Object arg) {
+    @Override
+	public void visit(MethodCallExpr n, Object arg) {
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
             printer.print(".");
@@ -713,7 +753,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(")");
     }
 
-    public void visit(ObjectCreationExpr n, Object arg) {
+    @Override
+	public void visit(ObjectCreationExpr n, Object arg) {
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
             printer.print(".");
@@ -745,12 +786,14 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(SuperMemberAccessExpr n, Object arg) {
+    @Override
+	public void visit(SuperMemberAccessExpr n, Object arg) {
         printer.print("super.");
         printer.print(n.getName());
     }
 
-    public void visit(UnaryExpr n, Object arg) {
+    @Override
+	public void visit(UnaryExpr n, Object arg) {
         switch (n.getOperator()) {
             case positive:
                 printer.print("+");
@@ -784,7 +827,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(ConstructorDeclaration n, Object arg) {
+    @Override
+	public void visit(ConstructorDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -823,7 +867,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getBlock().accept(this, arg);
     }
 
-    public void visit(MethodDeclaration n, Object arg) {
+    @Override
+	public void visit(MethodDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -873,7 +918,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(Parameter n, Object arg) {
+    @Override
+	public void visit(Parameter n, Object arg) {
         printAnnotations(n.getAnnotations(), arg);
         printModifiers(n.getModifiers());
 
@@ -885,7 +931,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getId().accept(this, arg);
     }
 
-    public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
+    @Override
+	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
         if (n.isThis()) {
             printTypeArgs(n.getTypeArgs(), arg);
             printer.print("this");
@@ -910,7 +957,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(");");
     }
 
-    public void visit(VariableDeclarationExpr n, Object arg) {
+    @Override
+	public void visit(VariableDeclarationExpr n, Object arg) {
         printAnnotations(n.getAnnotations(), arg);
         printModifiers(n.getModifiers());
 
@@ -926,11 +974,13 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(TypeDeclarationStmt n, Object arg) {
+    @Override
+	public void visit(TypeDeclarationStmt n, Object arg) {
         n.getTypeDeclaration().accept(this, arg);
     }
 
-    public void visit(AssertStmt n, Object arg) {
+    @Override
+	public void visit(AssertStmt n, Object arg) {
         printer.print("assert ");
         n.getCheck().accept(this, arg);
         if (n.getMessage() != null) {
@@ -940,7 +990,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(BlockStmt n, Object arg) {
+    @Override
+	public void visit(BlockStmt n, Object arg) {
         printer.printLn("{");
         if (n.getStmts() != null) {
             printer.indent();
@@ -954,22 +1005,26 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 
     }
     
-    public void visit(LabeledStmt n, Object arg) {
+    @Override
+	public void visit(LabeledStmt n, Object arg) {
         printer.print(n.getLabel());
         printer.print(": ");
         n.getStmt().accept(this, arg);
     }
 
-    public void visit(EmptyStmt n, Object arg) {
+    @Override
+	public void visit(EmptyStmt n, Object arg) {
         printer.print(";");
     }
 
-    public void visit(ExpressionStmt n, Object arg) {
+    @Override
+	public void visit(ExpressionStmt n, Object arg) {
         n.getExpression().accept(this, arg);
         printer.print(";");
     }
 
-    public void visit(SwitchStmt n, Object arg) {
+    @Override
+	public void visit(SwitchStmt n, Object arg) {
         printer.print("switch(");
         n.getSelector().accept(this, arg);
         printer.printLn(") {");
@@ -984,7 +1039,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 
     }
 
-    public void visit(SwitchEntryStmt n, Object arg) {
+    @Override
+	public void visit(SwitchEntryStmt n, Object arg) {
         if (n.getLabel() != null) {
             printer.print("case ");
             n.getLabel().accept(this, arg);
@@ -1003,7 +1059,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.unindent();
     }
 
-    public void visit(BreakStmt n, Object arg) {
+    @Override
+	public void visit(BreakStmt n, Object arg) {
         printer.print("break");
         if (n.getId() != null) {
             printer.print(" ");
@@ -1012,7 +1069,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(ReturnStmt n, Object arg) {
+    @Override
+	public void visit(ReturnStmt n, Object arg) {
         printer.print("return");
         if (n.getExpr() != null) {
             printer.print(" ");
@@ -1021,7 +1079,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(EnumDeclaration n, Object arg) {
+    @Override
+	public void visit(EnumDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -1066,7 +1125,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("}");
     }
 
-    public void visit(EnumConstantDeclaration n, Object arg) {
+    @Override
+	public void visit(EnumConstantDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -1094,14 +1154,16 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(EmptyMemberDeclaration n, Object arg) {
+    @Override
+	public void visit(EmptyMemberDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
         printer.print(";");
     }
 
-    public void visit(InitializerDeclaration n, Object arg) {
+    @Override
+	public void visit(InitializerDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -1111,7 +1173,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getBlock().accept(this, arg);
     }
 
-    public void visit(IfStmt n, Object arg) {
+    @Override
+	public void visit(IfStmt n, Object arg) {
         printer.print("if (");
         n.getCondition().accept(this, arg);
         printer.print(") ");
@@ -1122,14 +1185,16 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(WhileStmt n, Object arg) {
+    @Override
+	public void visit(WhileStmt n, Object arg) {
         printer.print("while (");
         n.getCondition().accept(this, arg);
         printer.print(") ");
         n.getBody().accept(this, arg);
     }
 
-    public void visit(ContinueStmt n, Object arg) {
+    @Override
+	public void visit(ContinueStmt n, Object arg) {
         printer.print("continue");
         if (n.getId() != null) {
             printer.print(" ");
@@ -1138,7 +1203,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(DoStmt n, Object arg) {
+    @Override
+	public void visit(DoStmt n, Object arg) {
         printer.print("do ");
         n.getBody().accept(this, arg);
         printer.print(" while (");
@@ -1146,7 +1212,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(");");
     }
 
-    public void visit(ForeachStmt n, Object arg) {
+    @Override
+	public void visit(ForeachStmt n, Object arg) {
         printer.print("for (");
         n.getVariable().accept(this, arg);
         printer.print(" : ");
@@ -1155,7 +1222,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getBody().accept(this, arg);
     }
 
-    public void visit(ForStmt n, Object arg) {
+    @Override
+	public void visit(ForStmt n, Object arg) {
         printer.print("for (");
         if (n.getInit() != null) {
             for (Iterator<Expression> i = n.getInit().iterator(); i.hasNext();) {
@@ -1184,20 +1252,23 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         n.getBody().accept(this, arg);
     }
 
-    public void visit(ThrowStmt n, Object arg) {
+    @Override
+	public void visit(ThrowStmt n, Object arg) {
         printer.print("throw ");
         n.getExpr().accept(this, arg);
         printer.print(";");
     }
 
-    public void visit(SynchronizedStmt n, Object arg) {
+    @Override
+	public void visit(SynchronizedStmt n, Object arg) {
         printer.print("synchronized (");
         n.getExpr().accept(this, arg);
         printer.print(") ");
         n.getBlock().accept(this, arg);
     }
 
-    public void visit(TryStmt n, Object arg) {
+    @Override
+	public void visit(TryStmt n, Object arg) {
         printer.print("try ");
         n.getTryBlock().accept(this, arg);
         if (n.getCatchs() != null) {
@@ -1211,7 +1282,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         }
     }
 
-    public void visit(CatchClause n, Object arg) {
+    @Override
+	public void visit(CatchClause n, Object arg) {
         printer.print(" catch (");
         n.getExcept().accept(this, arg);
         printer.print(") ");
@@ -1219,7 +1291,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 
     }
 
-    public void visit(AnnotationDeclaration n, Object arg) {
+    @Override
+	public void visit(AnnotationDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -1237,7 +1310,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print("}");
     }
 
-    public void visit(AnnotationMemberDeclaration n, Object arg) {
+    @Override
+	public void visit(AnnotationMemberDeclaration n, Object arg) {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
@@ -1255,12 +1329,14 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(";");
     }
 
-    public void visit(MarkerAnnotationExpr n, Object arg) {
+    @Override
+	public void visit(MarkerAnnotationExpr n, Object arg) {
         printer.print("@");
         n.getName().accept(this, arg);
     }
 
-    public void visit(SingleMemberAnnotationExpr n, Object arg) {
+    @Override
+	public void visit(SingleMemberAnnotationExpr n, Object arg) {
         printer.print("@");
         n.getName().accept(this, arg);
         printer.print("(");
@@ -1268,7 +1344,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(")");
     }
 
-    public void visit(NormalAnnotationExpr n, Object arg) {
+    @Override
+	public void visit(NormalAnnotationExpr n, Object arg) {
         printer.print("@");
         n.getName().accept(this, arg);
         printer.print("(");
@@ -1282,99 +1359,23 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(")");
     }
 
-    public void visit(MemberValuePair n, Object arg) {
+    @Override
+	public void visit(MemberValuePair n, Object arg) {
         printer.print(n.getName());
         printer.print(" = ");
         n.getValue().accept(this, arg);
     }
 
-    public void visit(LineComment n, Object arg) {
+    @Override
+	public void visit(LineComment n, Object arg) {
         printer.print("//");
         printer.printLn(n.getContent());
     }
 
-    public void visit(BlockComment n, Object arg) {
+    @Override
+	public void visit(BlockComment n, Object arg) {
         printer.print("/*");
         printer.print(n.getContent());
         printer.printLn("*/");
-    }
-
-    @Override
-    public void visit(FileStmt n, Object arg) {
-        
-    	//TODO: Check if the variable 'file' has already been declared. If so, don't declare it again.
-    	//TODO: Alter so that the catch, finally, closing stuff all happens after the last use of reader/writer (as applicable)
-    	//TODO: Ie the openfile{} block should only contain a filename and "r" or "w", everything else should be handled by my compiler
-    	
-        printer.printLn();
-        printer.printLn("//OPENFILE BLOCK STARTS HERE");
-        printer.printLn();
-        
-        if (n.read) {
-        	printer.printLn("BufferedReader reader = null;");
-        } else if (n.write) {
-        	printer.printLn("BufferedWriter writer = null;");
-        }
-        
-        printer.printLn("try {");
-        printer.indent();
-        if (n.read) {
-        	printer.printLn("reader = new BufferedReader(new FileReader(new File(" + n.filename + ")));");
-        } else if (n.write) {
-        	printer.printLn("writer = new BufferedWriter(new FileWriter(new File(" + n.filename + ")));");
-        }
-        
-        printer.printLn("{");
-        if (n.getStmts() != null) {
-            printer.indent();
-            for (Statement s : n.getStmts()) {
-                s.accept(this, arg);
-                printer.printLn();
-            }
-            printer.unindent();
-        }
-        printer.print("}");
-        printer.printLn();
-        
-        printer.unindent();
-        printer.printLn("} catch (FileNotFoundException e) {");
-        printer.indent();
-        printer.printLn("e.printStackTrace();");
-        printer.unindent();
-        printer.printLn("} catch (IOException e) {");
-        printer.indent();
-        printer.printLn("e.printStackTrace();");
-        printer.unindent();
-        printer.printLn("} finally {");
-        printer.indent();
-        printer.printLn("try {");
-        printer.indent();
-        
-        if (n.read) {
-	        printer.printLn("if (reader != null) {");
-	        printer.indent();
-	        printer.printLn("reader.close();");
-	        printer.unindent();
-	        printer.printLn("}");
-        } else if (n.write) {
-	        printer.printLn("if (writer != null) {");
-	        printer.indent();
-	        printer.printLn("writer.close();");
-	        printer.unindent();
-	        printer.printLn("}");
-        }
-        
-        printer.unindent();
-        printer.printLn("} catch (IOException e) {");
-        printer.indent();
-        printer.printLn("e.printStackTrace();");
-        printer.unindent();
-        printer.printLn("}");
-        printer.unindent();
-        printer.printLn("}");
-
-        printer.printLn();
-        printer.printLn("//OPENFILE BLOCK ENDS HERE");
-        
     }
 }
