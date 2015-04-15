@@ -90,6 +90,7 @@ import japa.parser.ast.type.WildcardType;
 import java.util.Iterator;
 
 import se701.A2SemanticsException;
+import symboltable.MethodSymbol;
 import symboltable.Scope;
 import symboltable.Symbol;
 
@@ -345,7 +346,25 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 									+ n.getBeginLine() + ".");
 				}
 			} else if (expr instanceof MethodCallExpr) {
-
+				Symbol resolvedSymbol = currentScope.resolve(((MethodCallExpr) expr).getName().toString());
+				
+				if (resolvedSymbol instanceof MethodSymbol) {
+					MethodSymbol m = (MethodSymbol) resolvedSymbol;
+					String returnType = m.getReturnType().getName();
+					if (t != returnType) {
+						throw new A2SemanticsException(returnType
+								+ " is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+					}
+				} else {
+					throw new A2SemanticsException("Retrieved Symbol "
+							+ resolvedSymbol.getName() + " ("
+							+ resolvedSymbol.getClass().getSimpleName()
+							+ ") from Scope " + currentScope.getScopeName()
+							+ " (expected MethodSymbol).");
+				}
 				// TODO check that return type of function is correct for this
 				// variable
 
