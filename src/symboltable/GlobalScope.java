@@ -17,6 +17,9 @@ public class GlobalScope extends BaseScope {
 		define(new BuiltInTypeSymbol("String"));
 		define(new BuiltInTypeSymbol("void"));
 		define(new BuiltInTypeSymbol("null"));
+
+		define(new VariableSymbol("true", resolveType("boolean")));
+		define(new VariableSymbol("false", resolveType("boolean")));
 	}
 	
 	@Override
@@ -56,6 +59,24 @@ public class GlobalScope extends BaseScope {
 		// otherwise look in the enclosing scope, if there is one
 		if (enclosingScope != null)
 			return enclosingScope.resolve(name);
+
+		// otherwise it doesn't exist
+		return null;
+	}
+
+	@Override
+	public Type resolveType(String name) {
+		// if the symbol exists in the current scope, return it
+		Symbol s = symbols.get(name);
+		if (s != null) {
+			if (s instanceof Type) {
+				return (Type) s;
+			}
+		}
+
+		// otherwise look in the enclosing scope, if there is one
+		if (enclosingScope != null)
+			return enclosingScope.resolveType(name);
 
 		// otherwise it doesn't exist
 		return null;

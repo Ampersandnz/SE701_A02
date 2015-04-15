@@ -24,7 +24,6 @@ import japa.parser.ast.body.Parameter;
 import japa.parser.ast.body.TypeDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
 import japa.parser.ast.body.VariableDeclaratorId;
-import japa.parser.ast.expr.AnnotationExpr;
 import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.ArrayCreationExpr;
 import japa.parser.ast.expr.ArrayInitializerExpr;
@@ -85,7 +84,6 @@ import japa.parser.ast.stmt.WhileStmt;
 import japa.parser.ast.type.ClassOrInterfaceType;
 import japa.parser.ast.type.PrimitiveType;
 import japa.parser.ast.type.ReferenceType;
-import japa.parser.ast.type.Type;
 import japa.parser.ast.type.VoidType;
 import japa.parser.ast.type.WildcardType;
 
@@ -101,34 +99,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 	private void visitMembers(List<BodyDeclaration> members, Object arg) {
 		for (BodyDeclaration member : members) {
 			member.accept(this, arg);
-		}
-	}
-
-	private void visitMemberAnnotations(List<AnnotationExpr> annotations,
-			Object arg) {
-		if (annotations != null) {
-			for (AnnotationExpr a : annotations) {
-				a.accept(this, arg);
-			}
-		}
-	}
-
-	private void visitAnnotations(List<AnnotationExpr> annotations, Object arg) {
-		if (annotations != null) {
-			for (AnnotationExpr a : annotations) {
-				a.accept(this, arg);
-			}
-		}
-	}
-
-	private void visitTypeArgs(List<Type> args, Object arg) {
-		if (args != null) {
-			for (Iterator<Type> i = args.iterator(); i.hasNext();) {
-				Type t = i.next();
-				t.accept(this, arg);
-				if (i.hasNext()) {
-				}
-			}
 		}
 	}
 
@@ -165,7 +135,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(PackageDeclaration n, Object arg) {
-		visitAnnotations(n.getAnnotations(), arg);
         n.getName().accept(this, arg);
     }
 
@@ -187,7 +156,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
 		visitTypeParameters(n.getTypeParameters(), arg);
 
@@ -225,7 +193,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
         }
-		visitTypeArgs(n.getTypeArgs(), arg);
     }
 
     @Override
@@ -259,7 +226,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
+
         n.getType().accept(this, arg);
 
         for (Iterator<VariableDeclarator> i = n.getVariables().iterator(); i.hasNext();) {
@@ -305,7 +272,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
     @Override
 	public void visit(ArrayCreationExpr n, Object arg) {
         n.getType().accept(this, arg);
-		visitTypeArgs(n.getTypeArgs(), arg);
 
         if (n.getDimensions() != null) {
             for (Expression dim : n.getDimensions()) {
@@ -423,7 +389,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getScope() != null) {
             n.getScope().accept(this, arg);
         }
-		visitTypeArgs(n.getTypeArgs(), arg);
+
         if (n.getArgs() != null) {
             for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
                 Expression e = i.next();
@@ -438,7 +404,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
             n.getScope().accept(this, arg);
         }
 
-		visitTypeArgs(n.getTypeArgs(), arg);
         n.getType().accept(this, arg);
 
         if (n.getArgs() != null) {
@@ -467,7 +432,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
 		visitTypeParameters(n.getTypeParameters(), arg);
 
@@ -492,7 +456,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
 		visitTypeParameters(n.getTypeParameters(), arg);
 
@@ -518,8 +481,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(Parameter n, Object arg) {
-		visitAnnotations(n.getAnnotations(), arg);
-
         n.getType().accept(this, arg);
         n.getId().accept(this, arg);
     }
@@ -527,12 +488,10 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
     @Override
 	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
         if (n.isThis()) {
-			visitTypeArgs(n.getTypeArgs(), arg);
         } else {
             if (n.getExpr() != null) {
                 n.getExpr().accept(this, arg);
             }
-			visitTypeArgs(n.getTypeArgs(), arg);
         }
         if (n.getArgs() != null) {
             for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
@@ -544,8 +503,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
 
     @Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
-		visitAnnotations(n.getAnnotations(), arg);
-
         n.getType().accept(this, arg);
 
         for (Iterator<VariableDeclarator> i = n.getVars().iterator(); i.hasNext();) {
@@ -632,7 +589,7 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
+
         if (n.getImplements() != null) {
             for (Iterator<ClassOrInterfaceType> i = n.getImplements().iterator(); i.hasNext();) {
                 ClassOrInterfaceType c = i.next();
@@ -656,7 +613,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
         if (n.getArgs() != null) {
             for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
@@ -773,7 +729,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
         if (n.getMembers() != null) {
 			visitMembers(n.getMembers(), arg);
@@ -785,7 +740,6 @@ public final class VisitAllTemplate implements VoidVisitor<Object> {
         if (n.getJavaDoc() != null) {
             n.getJavaDoc().accept(this, arg);
         }
-		visitMemberAnnotations(n.getAnnotations(), arg);
 
         n.getType().accept(this, arg);
         if (n.getDefaultValue() != null) {

@@ -7,8 +7,8 @@ public class MethodSymbol extends ScopedSymbol {
 	private Type returnType;
 	private List<Type> parameters;
 
-	public MethodSymbol(String name, Type type) {
-		super(name, type);
+	public MethodSymbol(String name) {
+		super(name, null);
 	}
 
 	public Type getReturnType() {

@@ -6,5 +6,4 @@ public class BuiltInTypeSymbol extends Symbol implements Type {
 		super(name, null);
 		setDefinedLine(0);
 	}
-	
 }

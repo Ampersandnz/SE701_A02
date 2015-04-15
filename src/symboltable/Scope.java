@@ -6,4 +6,5 @@ public interface Scope {
 	public void setEnclosingScope(Scope scope);
 	public void define(Symbol symbol);
 	public Symbol resolve(String name);
+	public Type resolveType(String name);
 }

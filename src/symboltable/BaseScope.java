@@ -34,4 +34,9 @@ public class BaseScope implements Scope  {
 	public Symbol resolve(String name) {
 		return null;
 	}
+
+	@Override
+	public Type resolveType(String name) {
+		return null;
+	}
 }

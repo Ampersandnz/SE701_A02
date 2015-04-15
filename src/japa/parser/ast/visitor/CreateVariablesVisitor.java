@@ -88,6 +88,7 @@ import japa.parser.ast.type.VoidType;
 import japa.parser.ast.type.WildcardType;
 
 import java.util.Iterator;
+import java.util.List;
 
 import se701.A2SemanticsException;
 import symboltable.MethodSymbol;
@@ -104,6 +105,21 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	private Scope currentScope;
 
+	private void visitMembers(List<BodyDeclaration> members, Object arg) {
+		for (BodyDeclaration member : members) {
+			member.accept(this, arg);
+		}
+	}
+
+	private void visitTypeParameters(List<TypeParameter> args, Object arg) {
+		if (args != null) {
+			for (Iterator<TypeParameter> i = args.iterator(); i.hasNext();) {
+				TypeParameter t = i.next();
+				t.accept(this, arg);
+			}
+		}
+	}
+
 	@Override
 	public void visit(Node n, Object arg) {
 		throw new IllegalStateException(n.getClass().getName());
@@ -111,8 +127,14 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(CompilationUnit n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
+		if (n.getPakage() != null) {
+			n.getPakage().accept(this, arg);
+		}
+		if (n.getImports() != null) {
+			for (ImportDeclaration i : n.getImports()) {
+				i.accept(this, arg);
+			}
+		}
 		if (n.getTypes() != null) {
 			for (Iterator<TypeDeclaration> i = n.getTypes().iterator(); i
 					.hasNext();) {
@@ -122,11 +144,17 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 	}
 
 	@Override
-	public void visit(FileStmt n, Object arg) {
+	public void visit(PackageDeclaration n, Object arg) {
+		n.getName().accept(this, arg);
 	}
 
 	@Override
-	public void visit(PackageDeclaration n, Object arg) {
+	public void visit(NameExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(QualifiedNameExpr n, Object arg) {
+		n.getQualifier().accept(this, arg);
 	}
 
 	@Override
@@ -134,48 +162,75 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 	}
 
 	@Override
-	public void visit(TypeParameter n, Object arg) {
-	}
-
-	@Override
-	public void visit(LineComment n, Object arg) {
-	}
-
-	@Override
-	public void visit(BlockComment n, Object arg) {
-	}
-
-	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
-		currentScope = n.getEnclosingScope();
-		
-		if (n.getMembers() != null) {
-			for (BodyDeclaration b : n.getMembers()) {
-				b.accept(this, arg);
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+
+		visitTypeParameters(n.getTypeParameters(), arg);
+
+		if (n.getExtends() != null) {
+			for (Iterator<ClassOrInterfaceType> i = n.getExtends().iterator(); i
+					.hasNext();) {
+				ClassOrInterfaceType c = i.next();
+				c.accept(this, arg);
 			}
 		}
 
-		currentScope = n.getEnclosingScope();
-	}
-
-	@Override
-	public void visit(EnumDeclaration n, Object arg) {
+		if (n.getImplements() != null) {
+			for (Iterator<ClassOrInterfaceType> i = n.getImplements()
+					.iterator(); i.hasNext();) {
+				ClassOrInterfaceType c = i.next();
+				c.accept(this, arg);
+			}
+		}
+		if (n.getMembers() != null) {
+			visitMembers(n.getMembers(), arg);
+		}
 	}
 
 	@Override
 	public void visit(EmptyTypeDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
 	}
 
 	@Override
-	public void visit(EnumConstantDeclaration n, Object arg) {
+	public void visit(JavadocComment n, Object arg) {
 	}
 
 	@Override
-	public void visit(AnnotationDeclaration n, Object arg) {
+	public void visit(ClassOrInterfaceType n, Object arg) {
+		if (n.getScope() != null) {
+			n.getScope().accept(this, arg);
+		}
 	}
 
 	@Override
-	public void visit(AnnotationMemberDeclaration n, Object arg) {
+	public void visit(TypeParameter n, Object arg) {
+		if (n.getTypeBound() != null) {
+			for (Iterator<ClassOrInterfaceType> i = n.getTypeBound().iterator(); i
+					.hasNext();) {
+				ClassOrInterfaceType c = i.next();
+				c.accept(this, arg);
+			}
+		}
+	}
+
+	@Override
+	public void visit(ReferenceType n, Object arg) {
+		n.getType().accept(this, arg);
+	}
+
+	@Override
+	public void visit(WildcardType n, Object arg) {
+		if (n.getExtends() != null) {
+			n.getExtends().accept(this, arg);
+		}
+		if (n.getSuper() != null) {
+			n.getSuper().accept(this, arg);
+		}
 	}
 
 	@Override
@@ -190,7 +245,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 				type = (Type) resolved;
 			} else {
 				throw new A2SemanticsException(resolved.getName()
-						+ " is not a type! Is a " + resolved.getClass().getName());
+						+ " is not a type! Is a "
+						+ resolved.getClass().getName());
 			}
 
 			String name = v.getId().toString();
@@ -198,32 +254,225 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 			symbol.setDefinedLine(v.getBeginLine());
 			currentScope.define(symbol);
 		}
+
+		n.getType().accept(this, arg);
 	}
 
 	@Override
 	public void visit(VariableDeclarator n, Object arg) {
+		n.getId().accept(this, arg);
+		if (n.getInit() != null) {
+			n.getInit().accept(this, arg);
+		}
 	}
 
 	@Override
 	public void visit(VariableDeclaratorId n, Object arg) {
+		for (int i = 0; i < n.getArrayCount(); i++) {
+		}
+	}
+
+	@Override
+	public void visit(ArrayInitializerExpr n, Object arg) {
+		if (n.getValues() != null) {
+			for (Iterator<Expression> i = n.getValues().iterator(); i.hasNext();) {
+				Expression expr = i.next();
+				expr.accept(this, arg);
+			}
+		}
+	}
+
+	@Override
+	public void visit(VoidType n, Object arg) {
+	}
+
+	@Override
+	public void visit(ArrayAccessExpr n, Object arg) {
+		n.getName().accept(this, arg);
+		n.getIndex().accept(this, arg);
+	}
+
+	@Override
+	public void visit(ArrayCreationExpr n, Object arg) {
+		n.getType().accept(this, arg);
+
+		if (n.getDimensions() != null) {
+			for (Expression dim : n.getDimensions()) {
+				dim.accept(this, arg);
+			}
+			for (int i = 0; i < n.getArrayCount(); i++) {
+			}
+		} else {
+			for (int i = 0; i < n.getArrayCount(); i++) {
+			}
+			n.getInitializer().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(AssignExpr n, Object arg) {
+		n.getTarget().accept(this, arg);
+
+		n.getValue().accept(this, arg);
+	}
+
+	@Override
+	public void visit(BinaryExpr n, Object arg) {
+		n.getLeft().accept(this, arg);
+
+		n.getRight().accept(this, arg);
+	}
+
+	@Override
+	public void visit(CastExpr n, Object arg) {
+		n.getType().accept(this, arg);
+		n.getExpr().accept(this, arg);
+	}
+
+	@Override
+	public void visit(ClassExpr n, Object arg) {
+		n.getType().accept(this, arg);
+	}
+
+	@Override
+	public void visit(ConditionalExpr n, Object arg) {
+		n.getCondition().accept(this, arg);
+		n.getThenExpr().accept(this, arg);
+		n.getElseExpr().accept(this, arg);
+	}
+
+	@Override
+	public void visit(EnclosedExpr n, Object arg) {
+		n.getInner().accept(this, arg);
+	}
+
+	@Override
+	public void visit(FieldAccessExpr n, Object arg) {
+		n.getScope().accept(this, arg);
+	}
+
+	@Override
+	public void visit(InstanceOfExpr n, Object arg) {
+		n.getExpr().accept(this, arg);
+		n.getType().accept(this, arg);
+	}
+
+	@Override
+	public void visit(CharLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(DoubleLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(IntegerLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(LongLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(IntegerLiteralMinValueExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(LongLiteralMinValueExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(StringLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(BooleanLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(NullLiteralExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(ThisExpr n, Object arg) {
+		if (n.getClassExpr() != null) {
+			n.getClassExpr().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(SuperExpr n, Object arg) {
+		if (n.getClassExpr() != null) {
+			n.getClassExpr().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(MethodCallExpr n, Object arg) {
+		if (n.getScope() != null) {
+			n.getScope().accept(this, arg);
+		}
+
+		if (n.getArgs() != null) {
+			for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
+	}
+
+	@Override
+	public void visit(ObjectCreationExpr n, Object arg) {
+		if (n.getScope() != null) {
+			n.getScope().accept(this, arg);
+		}
+
+		n.getType().accept(this, arg);
+
+		if (n.getArgs() != null) {
+			for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
+
+		if (n.getAnonymousClassBody() != null) {
+			visitMembers(n.getAnonymousClassBody(), arg);
+		}
+	}
+
+	@Override
+	public void visit(SuperMemberAccessExpr n, Object arg) {
+	}
+
+	@Override
+	public void visit(UnaryExpr n, Object arg) {
+		n.getExpr().accept(this, arg);
 	}
 
 	@Override
 	public void visit(ConstructorDeclaration n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
-		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
-
-			if (n.getBlock() != null) {
-				n.getBlock().accept(this, arg);
-			}
-		} else {
-			throw new A2SemanticsException(
-					"Scope of MethodDeclaration not a MethodSymbol! (is a "
-							+ currentScope.getClass().getName() + ")");
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
 		}
-		currentScope = n.getEnclosingScope();
+
+		visitTypeParameters(n.getTypeParameters(), arg);
+
+		if (n.getParameters() != null) {
+			for (Iterator<Parameter> i = n.getParameters().iterator(); i
+					.hasNext();) {
+				Parameter p = i.next();
+				p.accept(this, arg);
+			}
+		}
+
+		if (n.getThrows() != null) {
+			for (Iterator<NameExpr> i = n.getThrows().iterator(); i.hasNext();) {
+				NameExpr name = i.next();
+				name.accept(this, arg);
+			}
+		}
+		n.getBlock().accept(this, arg);
 	}
 
 	@Override
@@ -231,8 +480,6 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 		currentScope = n.getEnclosingScope();
 
 		if (currentScope instanceof MethodSymbol) {
-			MethodSymbol methodSymbol = (MethodSymbol) currentScope;
-
 			if (n.getBody() != null) {
 				n.getBody().accept(this, arg);
 			}
@@ -241,6 +488,7 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 					"Scope of MethodDeclaration not a MethodSymbol! (is a "
 							+ currentScope.getClass().getName() + ")");
 		}
+
 		currentScope = n.getEnclosingScope();
 
 		if (n.getParameters() != null) {
@@ -266,150 +514,24 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(Parameter n, Object arg) {
+		n.getType().accept(this, arg);
+		n.getId().accept(this, arg);
 	}
 
 	@Override
-	public void visit(EmptyMemberDeclaration n, Object arg) {
-	}
-
-	@Override
-	public void visit(InitializerDeclaration n, Object arg) {
-	}
-
-	@Override
-	public void visit(JavadocComment n, Object arg) {
-	}
-
-	@Override
-	public void visit(ClassOrInterfaceType n, Object arg) {
-	}
-
-	@Override
-	public void visit(PrimitiveType n, Object arg) {
-	}
-
-	@Override
-	public void visit(ReferenceType n, Object arg) {
-	}
-
-	@Override
-	public void visit(VoidType n, Object arg) {
-	}
-
-	@Override
-	public void visit(WildcardType n, Object arg) {
-	}
-
-	@Override
-	public void visit(ArrayAccessExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ArrayCreationExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ArrayInitializerExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(AssignExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(BinaryExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(CastExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ClassExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ConditionalExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(EnclosedExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(FieldAccessExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(InstanceOfExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(StringLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(IntegerLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(LongLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(IntegerLiteralMinValueExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(LongLiteralMinValueExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(CharLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(DoubleLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(BooleanLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(NullLiteralExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(MethodCallExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(NameExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ObjectCreationExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(QualifiedNameExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(SuperMemberAccessExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(ThisExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(SuperExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(UnaryExpr n, Object arg) {
+	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
+		if (n.isThis()) {
+		} else {
+			if (n.getExpr() != null) {
+				n.getExpr().accept(this, arg);
+			}
+		}
+		if (n.getArgs() != null) {
+			for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
 	}
 
 	@Override
@@ -433,47 +555,42 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 			symbol.setDefinedLine(v.getBeginLine());
 			currentScope.define(symbol);
 		}
-	}
 
-	@Override
-	public void visit(MarkerAnnotationExpr n, Object arg) {
-	}
+		n.getType().accept(this, arg);
 
-	@Override
-	public void visit(SingleMemberAnnotationExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(NormalAnnotationExpr n, Object arg) {
-	}
-
-	@Override
-	public void visit(MemberValuePair n, Object arg) {
-	}
-
-	@Override
-	public void visit(ExplicitConstructorInvocationStmt n, Object arg) {
-	}
-
-	@Override
-	public void visit(TypeDeclarationStmt n, Object arg) {
-	}
-
-	@Override
-	public void visit(AssertStmt n, Object arg) {
-	}
-
-	@Override
-	public void visit(BlockStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
-		for (Statement s : n.getStmts()) {
-			s.accept(this, arg);
+		for (Iterator<VariableDeclarator> i = n.getVars().iterator(); i
+				.hasNext();) {
+			VariableDeclarator v = i.next();
+			v.accept(this, arg);
 		}
 	}
 
 	@Override
+	public void visit(TypeDeclarationStmt n, Object arg) {
+		n.getTypeDeclaration().accept(this, arg);
+	}
+
+	@Override
+	public void visit(AssertStmt n, Object arg) {
+		n.getCheck().accept(this, arg);
+		if (n.getMessage() != null) {
+			n.getMessage().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(BlockStmt n, Object arg) {
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
+		}
+
+	}
+
+	@Override
 	public void visit(LabeledStmt n, Object arg) {
+		n.getStmt().accept(this, arg);
 	}
 
 	@Override
@@ -482,40 +599,32 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ExpressionStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-		
-		Expression e = n.getExpression();
-
-		if (e instanceof VariableDeclarationExpr) {
-			VariableDeclarationExpr d = (VariableDeclarationExpr) e;
-
-			for (VariableDeclarator v : d.getVars()) {
-				Symbol resolved = currentScope.resolve(d.getType().toString());
-				Type type = null;
-
-				if (resolved instanceof Type) {
-					type = (Type) resolved;
-				} else {
-					throw new A2SemanticsException(resolved.getName()
-							+ " is not a type! Is a "
-							+ resolved.getClass().getName());
-				}
-
-				String name = v.getId().toString();
-				VariableSymbol symbol = new VariableSymbol(name, type);
-				symbol.setDefinedLine(v.getBeginLine());
-				currentScope.define(symbol);
-			}
-
-		}
+		n.getExpression().accept(this, arg);
 	}
 
 	@Override
 	public void visit(SwitchStmt n, Object arg) {
+		n.getSelector().accept(this, arg);
+		if (n.getEntries() != null) {
+			for (SwitchEntryStmt e : n.getEntries()) {
+				e.accept(this, arg);
+			}
+		}
+
 	}
 
 	@Override
 	public void visit(SwitchEntryStmt n, Object arg) {
+		if (n.getLabel() != null) {
+			n.getLabel().accept(this, arg);
+		}
+
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
+		}
+
 	}
 
 	@Override
@@ -524,19 +633,84 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ReturnStmt n, Object arg) {
+		if (n.getExpr() != null) {
+			n.getExpr().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(EnumDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+
+		if (n.getImplements() != null) {
+			for (Iterator<ClassOrInterfaceType> i = n.getImplements()
+					.iterator(); i.hasNext();) {
+				ClassOrInterfaceType c = i.next();
+				c.accept(this, arg);
+			}
+		}
+
+		if (n.getEntries() != null) {
+			for (Iterator<EnumConstantDeclaration> i = n.getEntries()
+					.iterator(); i.hasNext();) {
+				EnumConstantDeclaration e = i.next();
+				e.accept(this, arg);
+			}
+		}
+		if (n.getMembers() != null) {
+			visitMembers(n.getMembers(), arg);
+		}
+	}
+
+	@Override
+	public void visit(EnumConstantDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+
+		if (n.getArgs() != null) {
+			for (Iterator<Expression> i = n.getArgs().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
+
+		if (n.getClassBody() != null) {
+			visitMembers(n.getClassBody(), arg);
+		}
+	}
+
+	@Override
+	public void visit(EmptyMemberDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(InitializerDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+		n.getBlock().accept(this, arg);
 	}
 
 	@Override
 	public void visit(IfStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
+		n.getCondition().accept(this, arg);
+		n.getThenStmt().accept(this, arg);
+		if (n.getElseStmt() != null) {
+			n.getElseStmt().accept(this, arg);
+		}
 		// TODO
 	}
 
 	@Override
 	public void visit(WhileStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
+		n.getCondition().accept(this, arg);
+		n.getBody().accept(this, arg);
 		// TODO
 	}
 
@@ -546,41 +720,134 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(DoStmt n, Object arg) {
+		n.getBody().accept(this, arg);
+		n.getCondition().accept(this, arg);
 	}
 
 	@Override
 	public void visit(ForeachStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
+		n.getVariable().accept(this, arg);
+		n.getIterable().accept(this, arg);
+		n.getBody().accept(this, arg);
 		// TODO
 	}
 
 	@Override
 	public void visit(ForStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
-
+		if (n.getInit() != null) {
+			for (Iterator<Expression> i = n.getInit().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
+		if (n.getCompare() != null) {
+			n.getCompare().accept(this, arg);
+		}
+		if (n.getUpdate() != null) {
+			for (Iterator<Expression> i = n.getUpdate().iterator(); i.hasNext();) {
+				Expression e = i.next();
+				e.accept(this, arg);
+			}
+		}
+		n.getBody().accept(this, arg);
 		// TODO
 	}
 
 	@Override
 	public void visit(ThrowStmt n, Object arg) {
+		n.getExpr().accept(this, arg);
 	}
 
 	@Override
 	public void visit(SynchronizedStmt n, Object arg) {
+		n.getExpr().accept(this, arg);
+		n.getBlock().accept(this, arg);
 	}
 
 	@Override
 	public void visit(TryStmt n, Object arg) {
-		currentScope = n.getEnclosingScope();
+		n.getTryBlock().accept(this, arg);
+		if (n.getCatchs() != null) {
+			for (CatchClause c : n.getCatchs()) {
+				c.accept(this, arg);
+			}
+		}
+		if (n.getFinallyBlock() != null) {
+			n.getFinallyBlock().accept(this, arg);
+		}
 
 		// TODO
 	}
 
 	@Override
 	public void visit(CatchClause n, Object arg) {
-		currentScope = n.getEnclosingScope();
+		n.getExcept().accept(this, arg);
+		n.getCatchBlock().accept(this, arg);
 
 		// TODO
+	}
+
+	@Override
+	public void visit(AnnotationDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+
+		if (n.getMembers() != null) {
+			visitMembers(n.getMembers(), arg);
+		}
+	}
+
+	@Override
+	public void visit(AnnotationMemberDeclaration n, Object arg) {
+		if (n.getJavaDoc() != null) {
+			n.getJavaDoc().accept(this, arg);
+		}
+
+		n.getType().accept(this, arg);
+		if (n.getDefaultValue() != null) {
+			n.getDefaultValue().accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(MarkerAnnotationExpr n, Object arg) {
+		n.getName().accept(this, arg);
+	}
+
+	@Override
+	public void visit(SingleMemberAnnotationExpr n, Object arg) {
+		n.getName().accept(this, arg);
+		n.getMemberValue().accept(this, arg);
+	}
+
+	@Override
+	public void visit(NormalAnnotationExpr n, Object arg) {
+		n.getName().accept(this, arg);
+		for (Iterator<MemberValuePair> i = n.getPairs().iterator(); i.hasNext();) {
+			MemberValuePair m = i.next();
+			m.accept(this, arg);
+		}
+	}
+
+	@Override
+	public void visit(MemberValuePair n, Object arg) {
+		n.getValue().accept(this, arg);
+	}
+
+	@Override
+	public void visit(LineComment n, Object arg) {
+	}
+
+	@Override
+	public void visit(BlockComment n, Object arg) {
+	}
+
+	@Override
+	public void visit(FileStmt n, Object arg) {
+	}
+
+	@Override
+	public void visit(PrimitiveType n, Object arg) {
 	}
 }

@@ -8,7 +8,6 @@ import japa.parser.ast.visitor.CreateScopesVisitor;
 import japa.parser.ast.visitor.CreateTypesVisitor;
 import japa.parser.ast.visitor.CreateVariablesVisitor;
 import japa.parser.ast.visitor.DumpVisitor;
-import japa.parser.ast.visitor.PrintASTNodeNameVisitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -53,8 +52,9 @@ public class A2Compiler {
 		// Visitor that (should) visit every node in the AST and print its class
 		// name.
 		// TODO: For debugging purposes only, remove before completion.
-		PrintASTNodeNameVisitor printASTNodeNameVisitor = new PrintASTNodeNameVisitor();
-		ast.accept(printASTNodeNameVisitor, null);
+		// PrintASTNodeNameVisitor printASTNodeNameVisitor = new
+		// PrintASTNodeNameVisitor();
+		// ast.accept(printASTNodeNameVisitor, null);
 
 		// Print the output .java file. Other than my additional feature, should
 		// be identical to the input .javax file.

@@ -52,4 +52,22 @@ public abstract class ScopedSymbol extends Symbol implements Scope {
 		// otherwise it doesn't exist
 		return null;
 	}
+
+	@Override
+	public Type resolveType(String name) {
+		// if the symbol exists in the current scope, return it
+		Symbol s = symbols.get(name);
+		if (s != null) {
+			if (s instanceof Type) {
+				return (Type) s;
+			}
+		}
+
+		// otherwise look in the enclosing scope, if there is one
+		if (enclosingScope != null)
+			return enclosingScope.resolveType(name);
+
+		// otherwise it doesn't exist
+		return null;
+	}
 }

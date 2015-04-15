@@ -28,6 +28,7 @@ import japa.parser.ast.expr.ArrayAccessExpr;
 import japa.parser.ast.expr.ArrayCreationExpr;
 import japa.parser.ast.expr.ArrayInitializerExpr;
 import japa.parser.ast.expr.AssignExpr;
+import japa.parser.ast.expr.AssignExpr.Operator;
 import japa.parser.ast.expr.BinaryExpr;
 import japa.parser.ast.expr.BooleanLiteralExpr;
 import japa.parser.ast.expr.CastExpr;
@@ -88,7 +89,9 @@ import japa.parser.ast.type.WildcardType;
 
 import java.util.Iterator;
 
+import se701.A2SemanticsException;
 import symboltable.Scope;
+import symboltable.Symbol;
 
 /**
  * @author Michael Lo
@@ -174,6 +177,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(FieldDeclaration n, Object arg) {
+		// TODO: If initialised in declaration, check that value is valid
 	}
 
 	@Override
@@ -198,7 +202,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(MethodDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
-		
+
 		if (n.getBody() != null) {
 			n.getBody().accept(this, arg);
 		}
@@ -263,8 +267,60 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(AssignExpr n, Object arg) {
+		currentScope = n.getEnclosingScope();
 
-		// TODO
+		Symbol target = currentScope.resolve(n.getTarget().toString());
+
+		if (target == null) {
+			throw new A2SemanticsException("Variable "
+					+ n.getTarget().toString()
+					+ " has not been defined on line " + n.getBeginLine() + "!");
+		}
+
+		if (n.getBeginLine() < target.getDefinedLine()) {
+			// Variables cannot be used prior to declaration.
+			throw new A2SemanticsException("Variable " + target.getName()
+					+ " has not been defined on line " + n.getBeginLine()
+					+ "! (Is defined on line " + target.getDefinedLine());
+		}
+
+		Operator operator = n.getOperator();
+
+		switch(operator) {
+		case assign: // =
+
+			// TODO: MethodCallExpr
+			// TODO: Primitive type
+			// TODO: Array access
+			// TODO: Array creation
+			// TODO: Cast
+			// TODO: Class
+			// TODO: Literal
+			// n.getValue()
+			break;
+		case plus: // +=
+			break;
+		case minus: // -=
+			break;
+		case star: // *=
+			break;
+		case slash: // /=
+			break;
+		case and: // &=
+			break;
+		case or: // |=
+			break;
+		case xor: // ^=
+			break;
+		case rem: // %=
+			break;
+		case lShift: // <<=
+			break;
+		case rSignedShift: // >>=
+			break;
+		case rUnsignedShift: // >>>=
+			break;
+		}
 	}
 
 	@Override
@@ -416,6 +472,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ExpressionStmt n, Object arg) {
+		n.getExpression().accept(this, arg);
 	}
 
 	@Override
