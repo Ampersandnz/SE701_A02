@@ -5,6 +5,6 @@ public class Test3 {
 			System.out.println("" + i);
 		}
 		
-		i = 0;
+		//i = 0; // out of scope
 	}
 }

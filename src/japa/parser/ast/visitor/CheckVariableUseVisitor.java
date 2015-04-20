@@ -72,6 +72,7 @@ import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.LabeledStmt;
+import japa.parser.ast.stmt.OpenStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.stmt.SwitchEntryStmt;
@@ -642,5 +643,10 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		currentScope = n.getEnclosingScope();
 
 		n.getCatchBlock().accept(this, arg);
+	}
+
+	@Override
+	public void visit(OpenStmt n, Object arg) {
+		// TODO
 	}
 }

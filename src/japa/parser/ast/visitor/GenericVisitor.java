@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Júlio Vilmar Gesser.
+ * Copyright (C) 2007 Jï¿½lio Vilmar Gesser.
  * 
  * This file is part of Java 1.5 parser and Abstract Syntax Tree.
  *
@@ -89,6 +89,7 @@ import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.LabeledStmt;
+import japa.parser.ast.stmt.OpenStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.SwitchEntryStmt;
 import japa.parser.ast.stmt.SwitchStmt;
@@ -279,5 +280,7 @@ public interface GenericVisitor<R, A> {
     public R visit(TryStmt n, A arg);
 
     public R visit(CatchClause n, A arg);
+
+	public R visit(OpenStmt n, A arg);
 
 }

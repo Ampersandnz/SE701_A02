@@ -83,49 +83,49 @@ public interface JavaParserConstants {
   /** RegularExpression Id. */
   int NULL = 44;
   /** RegularExpression Id. */
-  int PACKAGE = 45;
+  int OPENREADER = 45;
   /** RegularExpression Id. */
-  int PRIVATE = 46;
+  int OPENWRITER = 46;
   /** RegularExpression Id. */
-  int PROTECTED = 47;
+  int PACKAGE = 47;
   /** RegularExpression Id. */
-  int PUBLIC = 48;
+  int PRIVATE = 48;
   /** RegularExpression Id. */
-  int READ = 49;
+  int PROTECTED = 49;
   /** RegularExpression Id. */
-  int RETURN = 50;
+  int PUBLIC = 50;
   /** RegularExpression Id. */
-  int SHORT = 51;
+  int RETURN = 51;
   /** RegularExpression Id. */
-  int STATIC = 52;
+  int SHORT = 52;
   /** RegularExpression Id. */
-  int STRICTFP = 53;
+  int STATIC = 53;
   /** RegularExpression Id. */
-  int SUPER = 54;
+  int STRICTFP = 54;
   /** RegularExpression Id. */
-  int SWITCH = 55;
+  int STREAM = 55;
   /** RegularExpression Id. */
-  int SYNCHRONIZED = 56;
+  int SWITCH = 56;
   /** RegularExpression Id. */
-  int THIS = 57;
+  int SYNCHRONIZED = 57;
   /** RegularExpression Id. */
-  int THROW = 58;
+  int THIS = 58;
   /** RegularExpression Id. */
-  int THROWS = 59;
+  int THROW = 59;
   /** RegularExpression Id. */
-  int TRANSIENT = 60;
+  int THROWS = 60;
   /** RegularExpression Id. */
-  int TRUE = 61;
+  int TRANSIENT = 61;
   /** RegularExpression Id. */
-  int TRY = 62;
+  int TRUE = 62;
   /** RegularExpression Id. */
-  int VOID = 63;
+  int TRY = 63;
   /** RegularExpression Id. */
-  int VOLATILE = 64;
+  int VOID = 64;
   /** RegularExpression Id. */
-  int WHILE = 65;
+  int VOLATILE = 65;
   /** RegularExpression Id. */
-  int WRITE = 66;
+  int WHILE = 66;
   /** RegularExpression Id. */
   int LONG_LITERAL = 67;
   /** RegularExpression Id. */
@@ -307,16 +307,17 @@ public interface JavaParserConstants {
     "\"native\"",
     "\"new\"",
     "\"null\"",
+    "\"openReader\"",
+    "\"openWriter\"",
     "\"package\"",
     "\"private\"",
     "\"protected\"",
     "\"public\"",
-    "\"r\"",
     "\"return\"",
     "\"short\"",
     "\"static\"",
     "\"strictfp\"",
-    "\"super\"",
+    "\"stream\"",
     "\"switch\"",
     "\"synchronized\"",
     "\"this\"",
@@ -328,7 +329,6 @@ public interface JavaParserConstants {
     "\"void\"",
     "\"volatile\"",
     "\"while\"",
-    "\"w\"",
     "<LONG_LITERAL>",
     "<INTEGER_LITERAL>",
     "<DECIMAL_LITERAL>",
@@ -393,6 +393,7 @@ public interface JavaParserConstants {
     "\">>\"",
     "\">\"",
     "\"\\u001a\"",
+    "\"super\"",
   };
 
 }

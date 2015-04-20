@@ -94,6 +94,7 @@ import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.LabeledStmt;
+import japa.parser.ast.stmt.OpenStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.Statement;
 import japa.parser.ast.stmt.SwitchEntryStmt;
@@ -1378,4 +1379,9 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.print(n.getContent());
         printer.printLn("*/");
     }
+
+	@Override
+	public void visit(OpenStmt n, Object arg) {
+		printer.print("// Encountered OpenStmt! :D");
+	}
 }

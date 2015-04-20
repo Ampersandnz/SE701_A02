@@ -89,6 +89,7 @@ import japa.parser.ast.stmt.ForStmt;
 import japa.parser.ast.stmt.ForeachStmt;
 import japa.parser.ast.stmt.IfStmt;
 import japa.parser.ast.stmt.LabeledStmt;
+import japa.parser.ast.stmt.OpenStmt;
 import japa.parser.ast.stmt.ReturnStmt;
 import japa.parser.ast.stmt.SwitchEntryStmt;
 import japa.parser.ast.stmt.SwitchStmt;
@@ -279,5 +280,7 @@ public interface VoidVisitor<A> {
     public void visit(TryStmt n, A arg);
 
     public void visit(CatchClause n, A arg);
+
+	public void visit(OpenStmt n, A arg);
 
 }

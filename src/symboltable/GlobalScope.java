@@ -16,9 +16,21 @@ public class GlobalScope extends BaseScope {
 		define(new BuiltInTypeSymbol("String"));
 		define(new BuiltInTypeSymbol("void"));
 		define(new BuiltInTypeSymbol("null"));
+		define(new BuiltInTypeSymbol("BufferedReader"));
+		define(new BuiltInTypeSymbol("BufferedWriter"));
 
 		define(new VariableSymbol("true", resolveType("boolean")));
 		define(new VariableSymbol("false", resolveType("boolean")));
+		define(new VariableSymbol("reader", resolveType("BufferedReader")));
+		define(new VariableSymbol("writer", resolveType("BufferedWriter")));
+
+		MethodSymbol symbol = new MethodSymbol("readLine");
+		symbol.setReturnType(resolveType("String"));
+		define(symbol);
+
+		symbol = new MethodSymbol("write");
+		symbol.setReturnType(resolveType("String"));
+		define(symbol);
 	}
 	
 	@Override
