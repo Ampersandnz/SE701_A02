@@ -793,6 +793,8 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
             case preDecrement:
                 printer.print("--");
                 break;
+		default:
+			break;
         }
 
         n.getExpr().accept(this, arg);
@@ -804,6 +806,8 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
             case posDecrement:
                 printer.print("--");
                 break;
+		default:
+			break;
         }
     }
 
@@ -1414,7 +1418,6 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 		printer.printLn("}");
 	}
 }
-
 
 // TODO: Only close reader/writer after last use
 // TODO: If reader/writer NEVER used, throw exception

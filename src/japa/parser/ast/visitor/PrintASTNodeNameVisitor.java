@@ -994,6 +994,13 @@ public final class PrintASTNodeNameVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(OpenStmt n, Object arg) {
-		// TODO
+		System.out.println("Visited node " + n.toString() + " ("
+				+ n.getClass().getSimpleName() + ").\n");
+
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
+		}
 	}
 }

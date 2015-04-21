@@ -814,6 +814,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
             case preDecrement:
                 printer.print("--");
                 break;
+		default:
+			break;
         }
 
         n.getExpr().accept(this, arg);
@@ -825,6 +827,8 @@ public final class DumpVisitor implements VoidVisitor<Object> {
             case posDecrement:
                 printer.print("--");
                 break;
+		default:
+			break;
         }
     }
 
@@ -1382,8 +1386,6 @@ public final class DumpVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(OpenStmt n, Object arg) {
-		printer.printLn("// Encountered OpenStmt! :D");
-		
         if (n.getStmts() != null) {
             for (Statement s : n.getStmts()) {
                 s.accept(this, arg);

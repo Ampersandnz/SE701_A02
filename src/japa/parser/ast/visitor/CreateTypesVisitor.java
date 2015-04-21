@@ -819,6 +819,10 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(OpenStmt n, Object arg) {
-		// TODO
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
+		}
 	}
 }
