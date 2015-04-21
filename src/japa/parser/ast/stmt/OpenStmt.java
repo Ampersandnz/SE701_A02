@@ -1,37 +1,48 @@
-/*
- * Copyright (C) 2007 J�lio Vilmar Gesser.
- * 
- * This file is part of Java 1.5 parser and Abstract Syntax Tree.
- *
- * Java 1.5 parser and Abstract Syntax Tree is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Java 1.5 parser and Abstract Syntax Tree is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Java 1.5 parser and Abstract Syntax Tree.  If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * Created on 04/11/2006
- */
 package japa.parser.ast.stmt;
 
 import japa.parser.ast.visitor.GenericVisitor;
 import japa.parser.ast.visitor.VoidVisitor;
 
+import java.util.List;
+
 /**
- * @author Julio Vilmar Gesser
+ * @author Michael Lo
  */
 public final class OpenStmt extends Statement {
 
-	public OpenStmt(int beginLine, int beginColumn, int endLine, int endColumn) {
+	private final List<Statement> stmts;
+	private boolean isReader;
+	private boolean isFile;
+	private String target;
+
+	public OpenStmt(int beginLine, int beginColumn, int endLine, int endColumn,
+			boolean isReader, boolean isFile, String target,
+			List<Statement> stmts) {
         super(beginLine, beginColumn, endLine, endColumn);
+
+        this.isReader = isReader;
+        this.isFile = isFile;
+        
+		this.target = target;
+
+		this.stmts = stmts;
     }
+
+	public List<Statement> getStmts() {
+		return this.stmts;
+	}
+
+	public String getTarget() {
+		return this.target;
+	}
+
+	public boolean getIsReader() {
+		return this.isReader;
+	}
+
+	public boolean getIsFile() {
+		return this.isFile;
+	}
 
     @Override
     public <A> void accept(VoidVisitor<A> v, A arg) {

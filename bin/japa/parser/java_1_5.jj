@@ -241,12 +241,12 @@ TOKEN :
 | < NATIVE: "native" >
 | < NEW: "new" >
 | < NULL: "null" >
-| < OPENREADER: "openReader" >
-| < OPENWRITER: "openWriter" >
+| < OPEN: "open" >
 | < PACKAGE: "package">
 | < PRIVATE: "private" >
 | < PROTECTED: "protected" >
 | < PUBLIC: "public" >
+| < READER: "reader" >
 | < RETURN: "return" >
 | < SHORT: "short" >
 | < STATIC: "static" >
@@ -263,6 +263,7 @@ TOKEN :
 | < VOID: "void" >
 | < VOLATILE: "volatile" >
 | < WHILE: "while" >
+| < WRITER: "writer" >
 }
 
 /* LITERALS */
@@ -2448,9 +2449,11 @@ BlockStmt Block():
 
 OpenStmt OpenStatement():
 {
-  // Variables go here - read/write, filename etc
+  List stmts;
   boolean isReader;
-  String filePath;
+  boolean isFile;
+  String filePath = "";
+  String streamName = "";
   OpenStmt ret;
   int beginLine;
   int beginColumn;
@@ -2458,10 +2461,16 @@ OpenStmt OpenStatement():
   int endColumn;
 }
 {
-  (< OPENREADER > {isReader = true; beginLine=token.beginLine; beginColumn=token.beginColumn;} | 
-  < OPENWRITER > { isReader = false; beginLine=token.beginLine; beginColumn=token.beginColumn;})
-  <STRING_LITERAL> { filePath = token.image; endLine=token.beginLine; endColumn=token.beginColumn;}
-  { return new OpenStmt (beginLine, beginColumn, endLine, endColumn); }
+  < OPEN > (< READER > {isReader = true; beginLine=token.beginLine; beginColumn=token.beginColumn;} | 
+  < WRITER > { isReader = false; beginLine=token.beginLine; beginColumn=token.beginColumn;})
+  (< STRING_LITERAL > { isFile = true; filePath = token.image; } |
+  < IDENTIFIER > { isFile = false; streamName = token.image;})
+  "{"
+  	stmts = Statements()
+  "}" {endLine=token.beginLine; endColumn=token.beginColumn;}
+  { if (isFile)	  {	    return new OpenStmt (beginLine, beginColumn, endLine, endColumn, isReader, isFile, filePath, stmts); 
+	  } else {
+	   return new OpenStmt (beginLine, beginColumn, endLine, endColumn, isReader, isFile, streamName, stmts);	  }  }
 }
 
 /*

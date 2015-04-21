@@ -7,7 +7,7 @@ import japa.parser.ast.visitor.CheckVariableUseVisitor;
 import japa.parser.ast.visitor.CreateScopesVisitor;
 import japa.parser.ast.visitor.CreateTypesVisitor;
 import japa.parser.ast.visitor.CreateVariablesVisitor;
-import japa.parser.ast.visitor.DumpVisitor;
+import japa.parser.ast.visitor.SourceToSourceVisitor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,7 +58,8 @@ public class A2Compiler {
 
 		// Print the output .java file. Other than my additional feature, should
 		// be identical to the input .javax file.
-		DumpVisitor printVisitor = new DumpVisitor();
+		// DumpVisitor printVisitor = new DumpVisitor();
+		SourceToSourceVisitor printVisitor = new SourceToSourceVisitor();
 		ast.accept(printVisitor, null);
 		
 		String result = printVisitor.getSource();

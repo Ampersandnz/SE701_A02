@@ -1,24 +1,3 @@
-/*
- * Copyright (C) 2007 J�lio Vilmar Gesser.
- * 
- * This file is part of Java 1.5 parser and Abstract Syntax Tree.
- *
- * Java 1.5 parser and Abstract Syntax Tree is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Java 1.5 parser and Abstract Syntax Tree is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Java 1.5 parser and Abstract Syntax Tree.  If not, see <http://www.gnu.org/licenses/>.
- */
-/*
- * Created on 05/10/2006
- */
 package japa.parser.ast.visitor;
 
 import japa.parser.ast.BlockComment;
@@ -115,10 +94,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author Julio Vilmar Gesser
+ * @author Michael Lo
  */
 
-public final class DumpVisitor implements VoidVisitor<Object> {
+public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 
     private final SourcePrinter printer = new SourcePrinter();
 
@@ -1380,15 +1359,63 @@ public final class DumpVisitor implements VoidVisitor<Object> {
         printer.printLn("*/");
     }
 
+	// Syntax: open [reader, writer] [filename, stream] { Statements }
 	@Override
 	public void visit(OpenStmt n, Object arg) {
-		printer.printLn("// Encountered OpenStmt! :D");
-		
-        if (n.getStmts() != null) {
-            for (Statement s : n.getStmts()) {
-                s.accept(this, arg);
-                printer.printLn();
-            }
-        }
+		printer.printLn();
+
+		if (n.getIsReader()) {
+			printer.printLn("BufferedReader b_reader;");
+		} else {
+			printer.printLn("BufferedWriter b_writer;");
+		}
+
+		printer.printLn("try {");
+		printer.indent();
+
+		if (n.getIsFile()) {
+			if (n.getIsReader()) {
+				printer.printLn("b_reader = new BufferedReader(new FileReader("
+						+ n.getTarget() + "));");
+			} else {
+				printer.printLn("b_writer = new BufferedWriter(new FileWriter("
+						+ n.getTarget() + "));");
+			}
+		} else {
+			if (n.getIsReader()) {
+				printer.printLn();
+			} else {
+				printer.printLn();
+			}
+		}
+
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+				printer.printLn();
+			}
+		}
+
+		if (n.getIsReader()) {
+			printer.printLn("b_reader.close();");
+		} else {
+			printer.printLn("b_writer.close();");
+		}
+
+		printer.unindent();
+		printer.printLn("} catch (FileNotFoundException e) {");
+		printer.indent();
+		printer.printLn("e.printStackTrace();");
+		printer.unindent();
+		printer.printLn("} catch (IOException e) {");
+		printer.indent();
+		printer.printLn("e.printStackTrace();");
+		printer.unindent();
+		printer.printLn("}");
 	}
 }
+
+
+// TODO: Only close reader/writer after last use
+// TODO: If reader/writer NEVER used, throw exception
+// TODO: Allow use of stream variable names as input to open command

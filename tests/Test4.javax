@@ -4,28 +4,21 @@ public class Test4 {
 	
 	public void a() {	
 	
-		openReader "tests/text.txt";
-		
-		String read = "";
-		
-		String line = reader.readLine();
-		
-	    while ((line) != null) {
-	        read += line;
-	        line = reader.readLine();
-	    }
-		
-		System.out.println(read);
-		
-		openWriter "tests/text.txt";
-		
-		writer.write(read);
+		open reader "tests/text.txt" {
+			String read = "";
+			
+			String line = b_reader.readLine();
+			
+		    while ((line) != null) {
+		        read += line;
+		        line = b_reader.readLine();
+		    }
+			
+			System.out.println(read);
+			
+			open writer "tests/text.txt" {
+				b_writer.write(read);
+			}
+		}
 	}
 }
-
-
-// Syntax: open [reader, writer] filename/string variable name
-// Compiler - on encountering OpenStmt/Expr: 
-		// Close reader/writer after last use of it.
-		// If reader/writer not used, add comment warning in output Java file instead of opening it.
-		// Make sure output includes try/catch stuff. [IOException etc]
