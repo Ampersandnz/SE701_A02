@@ -5,5 +5,10 @@ public class Test1 {
     public void foo(boolean x) {
         a = 12;
         break;
+        Test2 lol = new Test2();
+        lol = new Test2();
+    }
+
+    public class Test2 {
     }
 }

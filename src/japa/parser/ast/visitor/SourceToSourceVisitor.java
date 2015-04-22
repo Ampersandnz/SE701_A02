@@ -1419,6 +1419,7 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 	}
 }
 
-// TODO: Only close reader/writer after last use
+// TODO: Only close reader/writer after last use instead of at the end of the
+// block
 // TODO: If reader/writer NEVER used, throw exception
 // TODO: Allow use of stream variable names as input to open command

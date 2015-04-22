@@ -3,6 +3,7 @@ package se701;
 import japa.parser.JavaParser;
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.visitor.CheckMethodsVisitor;
 import japa.parser.ast.visitor.CheckVariableUseVisitor;
 import japa.parser.ast.visitor.CreateScopesVisitor;
 import japa.parser.ast.visitor.CreateTypesVisitor;
@@ -49,12 +50,11 @@ public class A2Compiler {
 		CheckVariableUseVisitor checkVariables = new CheckVariableUseVisitor();
 		ast.accept(checkVariables, null);
 
-		/*
-		 * // Check that all method calls are to methods that exist, and pass in
-		 * // the correct type for each parameter. CheckMethodCallsVisitor
-		 * checkMethods = new CheckMethodCallsVisitor();
-		 * ast.accept(checkMethods, null);
-		 */
+
+		// Check that all method calls are to methods that exist, and pass in
+		// the correct type for each parameter.
+		CheckMethodsVisitor checkMethods = new CheckMethodsVisitor();
+		ast.accept(checkMethods, null);
 
 		// Print the output .java file. Other than my additional feature, should
 		// be identical to the input .javax file.

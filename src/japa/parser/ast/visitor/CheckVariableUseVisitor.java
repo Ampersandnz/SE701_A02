@@ -179,6 +179,128 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarator n, Object arg) {
+		Expression expr = n.getInit();
+		Symbol target = currentScope.resolve(n.getId().getName());
+
+		if (target == null) {
+			throw new A2SemanticsException("Variable " + n.getInit().toString()
+					+ " has not been defined on line " + n.getBeginLine() + "!");
+		}
+
+		if (n.getBeginLine() < target.getDefinedLine()) {
+			// Variables cannot be used prior to declaration.
+			throw new A2SemanticsException("Variable " + target.getName()
+					+ " has not been defined on line " + n.getBeginLine()
+					+ "! (Is defined on line " + target.getDefinedLine());
+		}
+
+		String t = target.getType().getName();
+
+		if (expr instanceof BinaryExpr) {
+			expr = ((BinaryExpr) expr).getLeft();
+		}
+
+		if (expr instanceof BooleanLiteralExpr) {
+			if (t != "boolean") {
+				throw new A2SemanticsException(
+						"boolean is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof NullLiteralExpr) {
+			if (t == "int" || t == "byte" || t == "short" || t == "long"
+					|| t == "double" || t == "float" || t == "boolean"
+					|| t == "char") {
+				throw new A2SemanticsException("Primitive variable "
+						+ target.getName() + " (" + target.getType().getName()
+						+ ") cannot be set to null on line " + n.getBeginLine()
+						+ ".");
+			}
+		} else if (expr instanceof CharLiteralExpr) {
+			if (t != "char") {
+				throw new A2SemanticsException(
+						"char is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof DoubleLiteralExpr) {
+			if (t != "double") {
+				throw new A2SemanticsException(
+						"double is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof IntegerLiteralExpr) {
+			if (t != "int") {
+				throw new A2SemanticsException(
+						"int is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof LongLiteralExpr) {
+			if (t != "long") {
+				throw new A2SemanticsException(
+						"long is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof StringLiteralExpr) {
+			if (t != "String") {
+				throw new A2SemanticsException(
+						"String is not a valid type for variable "
+								+ target.getName() + " ("
+								+ target.getType().getName() + ") on line "
+								+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof MethodCallExpr) {
+			Symbol resolvedSymbol = currentScope
+					.resolve(((MethodCallExpr) expr).getName().toString());
+
+			if (resolvedSymbol instanceof MethodSymbol) {
+				MethodSymbol m = (MethodSymbol) resolvedSymbol;
+				String returnType = m.getReturnType().getName();
+				if (t != returnType) {
+					throw new A2SemanticsException(returnType
+							+ " is not a valid type for variable "
+							+ target.getName() + " ("
+							+ target.getType().getName() + ") on line "
+							+ n.getBeginLine() + ".");
+				}
+			} else {
+				throw new A2SemanticsException("Retrieved Symbol "
+						+ resolvedSymbol.getName() + " ("
+						+ resolvedSymbol.getClass().getSimpleName()
+						+ ") from Scope " + currentScope.getScopeName()
+						+ " (expected MethodSymbol).");
+			}
+		} else if (expr instanceof ObjectCreationExpr) {
+			Symbol resolvedSymbol = currentScope
+					.resolve(((ObjectCreationExpr) expr).getType()
+							.getName());
+			
+			if (resolvedSymbol != target.getType()) {
+				throw new A2SemanticsException(resolvedSymbol.getName()
+						+ " is not a valid type for variable "
+						+ target.getName() + " ("
+						+ target.getType().getName() + ") on line "
+						+ n.getBeginLine() + ".");
+			}
+		} else if (expr instanceof NameExpr) {
+			Symbol resolvedSymbol = currentScope.resolve(((NameExpr) expr)
+					.getName());
+
+			if (resolvedSymbol.getType() != target.getType()) {
+				throw new A2SemanticsException(resolvedSymbol.getName()
+						+ " is not a valid return type for method "
+						+ target.getName() + " (" + target.getType().getName()
+						+ ") on line " + n.getBeginLine() + ".");
+			}
+		}
 	}
 
 	@Override
@@ -288,6 +410,10 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		case assign: // =
 			Expression expr = n.getValue();
 
+			if (expr instanceof BinaryExpr) {
+				expr = ((BinaryExpr) expr).getLeft();
+			}
+
 			if (expr instanceof BooleanLiteralExpr) {
 				if (t != "boolean") {
 					throw new A2SemanticsException(
@@ -347,8 +473,9 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 									+ n.getBeginLine() + ".");
 				}
 			} else if (expr instanceof MethodCallExpr) {
-				Symbol resolvedSymbol = currentScope.resolve(((MethodCallExpr) expr).getName().toString());
-				
+				Symbol resolvedSymbol = currentScope
+						.resolve(((MethodCallExpr) expr).getName().toString());
+
 				if (resolvedSymbol instanceof MethodSymbol) {
 					MethodSymbol m = (MethodSymbol) resolvedSymbol;
 					String returnType = m.getReturnType().getName();
@@ -366,17 +493,29 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 							+ ") from Scope " + currentScope.getScopeName()
 							+ " (expected MethodSymbol).");
 				}
-				// TODO check that return type of function is correct for this
-				// variable
+			} else if (expr instanceof ObjectCreationExpr) {
+				Symbol resolvedSymbol = currentScope
+						.resolve(((ObjectCreationExpr) expr).getType()
+								.getName());
 
-			} else if (expr instanceof ArrayAccessExpr) {
-				// TODO
-			} else if (expr instanceof ArrayCreationExpr) {
-				// TODO
-			} else if (expr instanceof CastExpr) {
-				// TODO
-			} else if (expr instanceof ClassExpr) {
-				// TODO
+				if (resolvedSymbol != target.getType()) {
+					throw new A2SemanticsException(resolvedSymbol.getName()
+							+ " is not a valid type for variable "
+							+ target.getName() + " ("
+							+ target.getType().getName() + ") on line "
+							+ n.getBeginLine() + ".");
+				}
+			} else if (expr instanceof NameExpr) {
+				Symbol resolvedSymbol = currentScope.resolve(((NameExpr) expr)
+						.getName());
+
+				if (resolvedSymbol.getType() != target.getType()) {
+					throw new A2SemanticsException(resolvedSymbol.getName()
+							+ " is not a valid return type for method "
+							+ target.getName() + " ("
+							+ target.getType().getName() + ") on line "
+							+ n.getBeginLine() + ".");
+				}
 			}
 			break;
 		case plus: // +=
@@ -502,8 +641,13 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
-		// TODO: Separate AssignExpr contents into subfunctions to avoid code
-		// duplication.
+		n.getType().accept(this, arg);
+
+		for (Iterator<VariableDeclarator> i = n.getVars().iterator(); i
+				.hasNext();) {
+			VariableDeclarator v = i.next();
+			v.accept(this, arg);
+		}
 	}
 
 	@Override
@@ -538,9 +682,12 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 	public void visit(BlockStmt n, Object arg) {
 		currentScope = n.getEnclosingScope();
 
-		for (Statement s : n.getStmts()) {
-			s.accept(this, arg);
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
 		}
+
 		currentScope = currentScope.getEnclosingScope();
 	}
 
@@ -581,7 +728,10 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		currentScope = n.getEnclosingScope();
 
 		n.getThenStmt().accept(this, arg);
-		n.getElseStmt().accept(this, arg);
+
+		if (n.getElseStmt() != null) {
+			n.getElseStmt().accept(this, arg);
+		}
 	}
 
 	@Override
