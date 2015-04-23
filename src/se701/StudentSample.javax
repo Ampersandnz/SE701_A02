@@ -1,45 +1,35 @@
 package se701;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 
 public class StudentSample {
 	
 	public static void main(String[] args) {
-        List<String> list = new ArrayList<String>();
        
-		openfile { "tests/text.txt" r
+		open reader "tests/text.txt" {
 			String text = null;
-	        while ((text = reader.readLine()) != null) {
-	            list.add(text);
+	        while ((text = b_reader.readLine()) != null) {
+	            System.out.println(text);
 	        }
         }
+		
+        FileOutputStream fos;
+		try {
+			fos = new FileOutputStream("tests/text.txt");
+		
+	        open writer fos {
+		        b_writer.write("This is the new contents of the file");
+	        }
         
-		//print out the list
-		System.out.println("List is: " + list);
-        
-        openfile { "tests/text.txt" w
+        } catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		open reader "tests/text.txt" {
 			String text = null;
-	        for (String s: list) {
-	        	writer.write(s);
+	        while ((text = b_reader.readLine()) != null) {
+	            System.out.println(text);
 	        }
         }
-        
-		openfile { "tests/text.txt" r
-			String text = null;
-	        while ((text = reader.readLine()) != null) {
-	            list.add(text);
-	        }
-        }
-	    
-		//print out the list
-		System.out.println("After writing back to the file, the list is now: " + list);
 	}
 }

@@ -107,6 +107,9 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 	private final SourcePrinter printer = new SourcePrinter();
 	private Scope currentScope;
 
+	private boolean readerExists = false;
+	private boolean writerExists = false;
+
 	public String getSource() {
 		return printer.getSource();
 	}
@@ -266,6 +269,9 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
+		readerExists = false;
+		writerExists = false;
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -1388,9 +1394,15 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 		printer.printLn();
 
 		if (n.getIsReader()) {
-			printer.printLn("BufferedReader b_reader;");
+			if (!readerExists) {
+				printer.printLn("BufferedReader b_reader;");
+				readerExists = true;
+			}
 		} else {
-			printer.printLn("BufferedWriter b_writer;");
+			if (!writerExists) {
+				printer.printLn("BufferedWriter b_writer;");
+				writerExists = true;
+			}
 		}
 
 		printer.printLn("try {");
@@ -1423,8 +1435,8 @@ public final class SourceToSourceVisitor implements VoidVisitor<Object> {
 				printer.printLn("b_reader = new BufferedReader("
 						+ n.getTarget() + ");");
 			} else {
-				printer.printLn("b_writer = new BufferedWriter("
-						+ n.getTarget() + ");");
+				printer.printLn("b_writer = new BufferedWriter(new OutputStreamWriter("
+						+ n.getTarget() + "));");
 			}
 		}
 

@@ -18,6 +18,8 @@ public class GlobalScope extends BaseScope {
 		define(new BuiltInTypeSymbol("null"));
 		define(new BuiltInTypeSymbol("BufferedReader"));
 		define(new BuiltInTypeSymbol("BufferedWriter"));
+		define(new BuiltInTypeSymbol("FileInputStream"));
+		define(new BuiltInTypeSymbol("FileOutputStream"));
 
 		define(new VariableSymbol("true", resolveType("boolean")));
 		define(new VariableSymbol("false", resolveType("boolean")));

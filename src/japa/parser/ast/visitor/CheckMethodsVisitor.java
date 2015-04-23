@@ -366,7 +366,8 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 							Symbol resolvedSymbol = currentScope
 									.resolve(((NameExpr) expr).getName());
 
-							if (resolvedSymbol.getType() != theMethod
+							if (resolvedSymbol == null
+									|| resolvedSymbol.getType() != theMethod
 									.getReturnType()) {
 								throw new A2SemanticsException("The method "
 										+ theMethod.getName()

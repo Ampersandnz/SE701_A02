@@ -1,10 +1,11 @@
 import java.io.*;
 
-public class Test4 {
+public class Test4 extends Test4_1 {
 	
 	public void a() {	
-	
-		open reader "tests/text.txt" {
+		FileInputStream in = new FileInputStream("tests/text.txt");
+		
+		open reader in {
 			String read = "";
 			
 			String line = b_reader.readLine();
@@ -15,10 +16,17 @@ public class Test4 {
 		    }
 			
 			System.out.println(read);
-			
-			open writer "tests/text.txt" {
-				b_writer.write(read);
-			}
 		}
 	}
+}
+
+public class Test4_1 implements Test4_2 {
+	
+	public String b(String in) {
+		return in;
+	}
+}
+
+public interface Test4_2 {
+	public String b(String in);
 }
