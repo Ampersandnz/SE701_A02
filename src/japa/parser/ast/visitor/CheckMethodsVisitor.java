@@ -88,11 +88,13 @@ import japa.parser.ast.type.VoidType;
 import japa.parser.ast.type.WildcardType;
 
 import java.util.Iterator;
+import java.util.List;
 
 import se701.A2SemanticsException;
 import symboltable.MethodSymbol;
 import symboltable.Scope;
 import symboltable.Symbol;
+import symboltable.Type;
 
 /**
  * @author Michael Lo
@@ -142,7 +144,7 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 		currentScope = n.getEnclosingScope();
-		
+
 		if (n.getMembers() != null) {
 			for (BodyDeclaration b : n.getMembers()) {
 				b.accept(this, arg);
@@ -178,6 +180,9 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarator n, Object arg) {
+		if (n.getInit() instanceof MethodCallExpr) {
+			n.getInit().accept(this, arg);
+		}
 	}
 
 	@Override
@@ -213,18 +218,7 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 						expr = ((BinaryExpr) expr).getLeft();
 					}
 
-					if (expr instanceof BooleanLiteralExpr) {
-						hasReturn = true;
-						if (t != "boolean") {
-							throw new A2SemanticsException(
-									"boolean is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
-						}
-					} else if (expr instanceof NullLiteralExpr) {
+					if (expr instanceof NullLiteralExpr) {
 						hasReturn = true;
 						if (t == "int" || t == "byte" || t == "short"
 								|| t == "long" || t == "double" || t == "float"
@@ -238,57 +232,56 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 					} else if (expr instanceof CharLiteralExpr) {
 						hasReturn = true;
 						if (t != "char") {
-							throw new A2SemanticsException(
-									"char is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof DoubleLiteralExpr) {
 						hasReturn = true;
 						if (t != "double") {
-							throw new A2SemanticsException(
-									"double is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof IntegerLiteralExpr) {
 						hasReturn = true;
 						if (t != "int") {
-							throw new A2SemanticsException(
-									"int is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof LongLiteralExpr) {
 						hasReturn = true;
 						if (t != "long") {
-							throw new A2SemanticsException(
-									"long is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof StringLiteralExpr) {
 						hasReturn = true;
 						if (t != "String") {
-							throw new A2SemanticsException(
-									"String is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof BooleanLiteralExpr) {
+						hasReturn = true;
+						if (t != "boolean") {
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof MethodCallExpr) {
 						hasReturn = true;
@@ -300,14 +293,11 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 							MethodSymbol m = (MethodSymbol) resolvedSymbol;
 							String returnType = m.getReturnType().getName();
 							if (t != returnType) {
-								throw new A2SemanticsException(returnType
-												+ " is not a valid return type for method "
-												+ theMethod.getName()
-												+ " ("
-												+ theMethod.getReturnType()
-														.getName()
-												+ ") on line "
-												+ n.getBeginLine() + ".");
+								throw new A2SemanticsException("The method "
+										+ theMethod.getName()
+										+ " must return a value of type "
+										+ theMethod.getReturnType().getName()
+										+ "(On line " + n.getBeginLine() + ".)");
 							}
 						} else {
 							throw new A2SemanticsException("Retrieved Symbol "
@@ -324,14 +314,11 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 										.getName());
 
 						if (resolvedSymbol != theMethod.getReturnType()) {
-							throw new A2SemanticsException(
-									resolvedSymbol.getName()
-											+ " is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					} else if (expr instanceof NameExpr) {
 						hasReturn = true;
@@ -340,20 +327,19 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 						if (resolvedSymbol.getType() != theMethod
 								.getReturnType()) {
-							throw new A2SemanticsException(
-									resolvedSymbol.getName()
-											+ " is not a valid return type for method "
-											+ theMethod.getName()
-											+ " ("
-											+ theMethod.getReturnType()
-													.getName() + ") on line "
-											+ n.getBeginLine() + ".");
+							throw new A2SemanticsException("The method "
+									+ theMethod.getName()
+									+ " must return a value of type "
+									+ theMethod.getReturnType().getName()
+									+ "(On line " + n.getBeginLine() + ".)");
 						}
 					}
 				}
 			}
 		}
-		
+
+		body.accept(this, arg);
+
 		if (!hasReturn) {
 			throw new A2SemanticsException("Method "
 					+ n.getName()
@@ -414,6 +400,9 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(AssignExpr n, Object arg) {
+		if (n.getValue() instanceof MethodCallExpr) {
+			n.getValue().accept(this, arg);
+		}
 	}
 
 	@Override
@@ -483,9 +472,143 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(MethodCallExpr n, Object arg) {
 		currentScope = n.getEnclosingScope();
-		System.out.println("MethodCallExpr");
-		// TODO: Make sure all parameters match
-		// TODO: Make sure all methods called actually exist in that scope
+
+		Symbol resolved = currentScope.resolve(n.getName());
+
+		if (resolved instanceof MethodSymbol) {
+			MethodSymbol m = (MethodSymbol) resolved;
+
+			List<Type> expected = m.getParameters();
+			List<Expression> received = n.getArgs();
+
+			if (expected != null) {
+				for (int i = 0; i < expected.size(); i++) {
+					Expression expr = received.get(i);
+					Type type = expected.get(i);
+					String t = type.getName();
+
+					if (expr instanceof BinaryExpr) {
+						expr = ((BinaryExpr) expr).getLeft();
+					}
+
+					if (expr instanceof NullLiteralExpr) {
+						if (t == "int" || t == "byte" || t == "short"
+								|| t == "long" || t == "double" || t == "float"
+								|| t == "boolean" || t == "char") {
+							throw new A2SemanticsException(
+									"Primitive parameter of method "
+											+ m.getName()
+											+ " cannot be null! (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof CharLiteralExpr) {
+						if (t != "char") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type char (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof DoubleLiteralExpr) {
+						if (t != "double") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type double (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof IntegerLiteralExpr) {
+						if (t != "int") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type int (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof LongLiteralExpr) {
+						if (t != "long") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type long (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof StringLiteralExpr) {
+						if (t != "String") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type String (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof BooleanLiteralExpr) {
+						if (t != "boolean") {
+							throw new A2SemanticsException(
+									"Method "
+											+ m.getName()
+											+ " does not have a parameter of type boolean (expected "
+											+ t + ") (On line "
+											+ n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof MethodCallExpr) {
+						Symbol resolvedSymbol = currentScope
+								.resolve(((MethodCallExpr) expr).getName()
+										.toString());
+
+						if (resolvedSymbol instanceof MethodSymbol) {
+							MethodSymbol method = (MethodSymbol) resolvedSymbol;
+							String returnType = method.getReturnType()
+									.getName();
+							if (t != returnType) {
+								throw new A2SemanticsException("Method "
+										+ m.getName()
+										+ " does not have a parameter of type "
+										+ returnType + " (expected " + t
+										+ ") (On line " + n.getBeginLine()
+										+ ".)");
+							}
+						} else {
+							throw new A2SemanticsException("Retrieved Symbol "
+									+ resolvedSymbol.getName() + " ("
+									+ resolvedSymbol.getClass().getSimpleName()
+									+ ") from Scope "
+									+ currentScope.getScopeName()
+									+ " (expected MethodSymbol).");
+						}
+					} else if (expr instanceof ObjectCreationExpr) {
+						Symbol resolvedSymbol = currentScope
+								.resolve(((ObjectCreationExpr) expr).getType()
+										.getName());
+
+						if (resolvedSymbol.getType().getName() != t) {
+							throw new A2SemanticsException("Method "
+									+ m.getName()
+									+ " does not have a parameter of type "
+									+ resolvedSymbol.getType().getName()
+									+ " (expected " + t
+									+ ") (On line " + n.getBeginLine() + ".)");
+						}
+					} else if (expr instanceof NameExpr) {
+						Symbol resolvedSymbol = currentScope
+								.resolve(((NameExpr) expr).getName());
+
+						if (resolvedSymbol.getType().getName() != t) {
+							throw new A2SemanticsException("Method "
+									+ m.getName()
+									+ " does not have a parameter of type "
+									+ resolvedSymbol.getType().getName()
+									+ " (expected " + t + ") (On line "
+									+ n.getBeginLine() + ".)");
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -518,6 +641,11 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(VariableDeclarationExpr n, Object arg) {
+		if (n.getVars() != null) {
+			for (VariableDeclarator v : n.getVars()) {
+				v.accept(this, arg);
+			}
+		}
 	}
 
 	@Override
@@ -550,6 +678,11 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(BlockStmt n, Object arg) {
+		if (n.getStmts() != null) {
+			for (Statement s : n.getStmts()) {
+				s.accept(this, arg);
+			}
+		}
 	}
 
 	@Override
@@ -562,6 +695,7 @@ public class CheckMethodsVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ExpressionStmt n, Object arg) {
+		n.getExpression().accept(this, arg);
 	}
 
 	@Override

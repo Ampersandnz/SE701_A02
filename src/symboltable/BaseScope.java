@@ -6,7 +6,7 @@ import java.util.List;
 
 import se701.A2SemanticsException;
 
-public class BaseScope implements Scope  {
+public abstract class BaseScope implements Scope {
 
 	protected HashMap<String, Symbol> symbols = new HashMap<String, Symbol>();
 	protected Scope enclosingScope = null;
