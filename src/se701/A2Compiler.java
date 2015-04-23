@@ -28,6 +28,7 @@ public class A2Compiler {
 
 		// Visitor that (should) visit every node in the AST and print its class
 		// name.
+
 		// TODO: For debugging purposes only, remove before completion.
 		// PrintASTNodeNameVisitor printASTNodeNameVisitor = new
 		// PrintASTNodeNameVisitor();

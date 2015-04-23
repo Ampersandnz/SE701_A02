@@ -183,7 +183,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		Symbol target = currentScope.resolve(n.getId().getName());
 
 		if (target == null) {
-			throw new A2SemanticsException("Variable " + n.getInit().toString()
+			throw new A2SemanticsException("Variable " + n.getId().toString()
 					+ " has not been defined on line " + n.getBeginLine() + "!");
 		}
 
@@ -280,15 +280,13 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 			}
 		} else if (expr instanceof ObjectCreationExpr) {
 			Symbol resolvedSymbol = currentScope
-					.resolve(((ObjectCreationExpr) expr).getType()
-							.getName());
-			
+					.resolve(((ObjectCreationExpr) expr).getType().getName());
+
 			if (resolvedSymbol != target.getType()) {
 				throw new A2SemanticsException(resolvedSymbol.getName()
 						+ " is not a valid type for variable "
-						+ target.getName() + " ("
-						+ target.getType().getName() + ") on line "
-						+ n.getBeginLine() + ".");
+						+ target.getName() + " (" + target.getType().getName()
+						+ ") on line " + n.getBeginLine() + ".");
 			}
 		} else if (expr instanceof NameExpr) {
 			Symbol resolvedSymbol = currentScope.resolve(((NameExpr) expr)
@@ -797,6 +795,8 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(OpenStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getStmts() != null) {
 			for (Statement s : n.getStmts()) {
 				s.accept(this, arg);

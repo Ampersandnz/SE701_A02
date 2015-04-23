@@ -93,9 +93,12 @@ import java.util.List;
 
 import se701.A2SemanticsException;
 import symboltable.ClassSymbol;
+import symboltable.EnumSymbol;
 import symboltable.GlobalScope;
+import symboltable.InterfaceSymbol;
 import symboltable.LocalScope;
 import symboltable.MethodSymbol;
+import symboltable.OpenScope;
 import symboltable.Scope;
 import symboltable.Symbol;
 import symboltable.Type;
@@ -111,6 +114,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 	private void visitMembers(List<BodyDeclaration> members, Object arg) {
 		for (BodyDeclaration member : members) {
 			member.accept(this, arg);
+			member.setEnclosingScope(currentScope);
 		}
 	}
 
@@ -151,6 +155,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(ImportDeclaration n, Object arg) {
+		n.setEnclosingScope(currentScope);
 	}
 
 	@Override
@@ -178,7 +183,19 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
 		if (n.isInterface()) {
-			// TODO Is a scope - can have fields + has method signatures.
+			InterfaceSymbol interfaceSymbol = new InterfaceSymbol(n.getName());
+			interfaceSymbol.setEnclosingScope(currentScope);
+
+			currentScope = interfaceSymbol;
+			n.setEnclosingScope(currentScope);
+
+			if (n.getMembers() != null) {
+				for (BodyDeclaration b : n.getMembers()) {
+					b.accept(this, arg);
+				}
+			}
+			
+			currentScope = currentScope.getEnclosingScope();
 		} else {
 			ClassSymbol classSymbol =  new ClassSymbol(n.getName());
 			classSymbol.setEnclosingScope(currentScope);
@@ -198,7 +215,12 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(EnumDeclaration n, Object arg) {
+		EnumSymbol enumSymbol = new EnumSymbol(n.getName());
+		enumSymbol.setEnclosingScope(currentScope);
+
+		currentScope = enumSymbol;
 		n.setEnclosingScope(currentScope);
+
 		if (n.getJavaDoc() != null) {
 			n.getJavaDoc().accept(this, arg);
 		}
@@ -322,6 +344,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 	public void visit(MethodDeclaration n, Object arg) {
 		MethodSymbol methodSymbol = new MethodSymbol(n.getName());
 		methodSymbol.setEnclosingScope(currentScope);
+
 		currentScope = methodSymbol;
 		n.setEnclosingScope(currentScope);
 
@@ -417,9 +440,11 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(WildcardType n, Object arg) {
 		n.setEnclosingScope(currentScope);
+
 		if (n.getExtends() != null) {
 			n.getExtends().accept(this, arg);
 		}
+
 		if (n.getSuper() != null) {
 			n.getSuper().accept(this, arg);
 		}
@@ -922,6 +947,12 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(OpenStmt n, Object arg) {
+		OpenScope openScope = new OpenScope();
+		openScope.setEnclosingScope(currentScope);
+
+		currentScope = openScope;
+		n.setEnclosingScope(currentScope);
+
 		if (n.getStmts() != null) {
 			for (Statement s : n.getStmts()) {
 				s.accept(this, arg);
