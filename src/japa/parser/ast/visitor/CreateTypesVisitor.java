@@ -87,12 +87,15 @@ import japa.parser.ast.type.ReferenceType;
 import japa.parser.ast.type.VoidType;
 import japa.parser.ast.type.WildcardType;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import se701.A2SemanticsException;
 import symboltable.ClassSymbol;
 import symboltable.InterfaceSymbol;
 import symboltable.Scope;
+import symboltable.Symbol;
 
 /**
  * @author Michael Lo
@@ -167,26 +170,83 @@ public class CreateTypesVisitor implements VoidVisitor<Object> {
 		if (currentScope instanceof ClassSymbol) {
 			ClassSymbol classSymbol = (ClassSymbol) currentScope;
 
+			if (n.getImplements() != null) {
+				List<InterfaceSymbol> implementsList = new ArrayList<InterfaceSymbol>();
+
+				for (ClassOrInterfaceType c : n.getImplements()) {
+					Symbol resolved = currentScope.resolve(c.getName());
+
+					if (resolved instanceof InterfaceSymbol) {
+						InterfaceSymbol resolvedInterface = (InterfaceSymbol) resolved;
+
+						implementsList.add(resolvedInterface);
+					} else {
+						throw new A2SemanticsException("Error in class "
+								+ n.getName() + " on line " + n.getBeginLine()
+								+ "! Interface " + c.getName()
+								+ " resolved to type "
+								+ resolved.getClass().getSimpleName()
+								+ " (must be an InterfaceSymbol)");
+					}
+				}
+
+				classSymbol.setInterfaces(implementsList);
+			}
+
+			if (n.getExtends() != null) {
+				for (ClassOrInterfaceType c : n.getExtends()) {
+					
+					Symbol resolved = currentScope.resolve(c.getName());
+
+					if (resolved instanceof ClassSymbol) {
+						ClassSymbol resolvedClass = (ClassSymbol) resolved;
+						
+						classSymbol.setSuperclass(resolvedClass);
+					} else {
+						throw new A2SemanticsException("Error in class "
+								+ n.getName() + " on line " + n.getBeginLine()
+								+ "! Superclass " + c.getName()
+								+ " resolved to type "
+								+ resolved.getClass().getSimpleName()
+								+ " (must be a ClassSymbol)");
+					}
+				}
+			}
+
 			if (n.getMembers() != null) {
 				for (BodyDeclaration b : n.getMembers()) {
 					b.accept(this, arg);
 				}
 			}
-
-			// Define the class/interface in the scope above it.
-			n.getEnclosingScope().getEnclosingScope().define(classSymbol);
 
 		} else if (currentScope instanceof InterfaceSymbol) {
 			InterfaceSymbol interfaceSymbol = (InterfaceSymbol) currentScope;
 
+			if (n.getExtends() != null) {
+				for (ClassOrInterfaceType c : n.getExtends()) {
+
+					Symbol resolved = currentScope.resolve(c.getName());
+
+					if (resolved instanceof InterfaceSymbol) {
+						InterfaceSymbol resolvedInterface = (InterfaceSymbol) resolved;
+
+						interfaceSymbol.setSuperinterface(resolvedInterface);
+					} else {
+						throw new A2SemanticsException("Error in class "
+								+ n.getName() + " on line " + n.getBeginLine()
+								+ "! Superclass " + c.getName()
+								+ " resolved to type "
+								+ resolved.getClass().getSimpleName()
+								+ " (must be an InterfaceSymbol)");
+					}
+				}
+			}
+
 			if (n.getMembers() != null) {
 				for (BodyDeclaration b : n.getMembers()) {
 					b.accept(this, arg);
 				}
 			}
-
-			// Define the class/interface in the scope above it.
-			n.getEnclosingScope().getEnclosingScope().define(interfaceSymbol);
 		}
 
 		currentScope = currentScope.getEnclosingScope();

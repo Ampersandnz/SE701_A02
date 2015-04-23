@@ -59,6 +59,7 @@ public abstract class BaseScope implements Scope {
 
 	@Override
 	public Type resolveType(String name) {
+
 		// if the symbol exists in the current scope, return it
 		Symbol s = symbols.get(name);
 		if (s != null) {

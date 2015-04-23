@@ -707,19 +707,21 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(IfStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getCondition().accept(this, arg);
 		n.getThenStmt().accept(this, arg);
 		if (n.getElseStmt() != null) {
 			n.getElseStmt().accept(this, arg);
 		}
-		// TODO
 	}
 
 	@Override
 	public void visit(WhileStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getCondition().accept(this, arg);
 		n.getBody().accept(this, arg);
-		// TODO
 	}
 
 	@Override
@@ -728,20 +730,25 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(DoStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getBody().accept(this, arg);
 		n.getCondition().accept(this, arg);
 	}
 
 	@Override
 	public void visit(ForeachStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getVariable().accept(this, arg);
 		n.getIterable().accept(this, arg);
 		n.getBody().accept(this, arg);
-		// TODO
 	}
 
 	@Override
 	public void visit(ForStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		if (n.getInit() != null) {
 			for (Iterator<Expression> i = n.getInit().iterator(); i.hasNext();) {
 				Expression e = i.next();
@@ -757,8 +764,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 				e.accept(this, arg);
 			}
 		}
+
 		n.getBody().accept(this, arg);
-		// TODO
 	}
 
 	@Override
@@ -774,6 +781,8 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 
 	@Override
 	public void visit(TryStmt n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getTryBlock().accept(this, arg);
 		if (n.getCatchs() != null) {
 			for (CatchClause c : n.getCatchs()) {
@@ -783,16 +792,14 @@ public class CreateVariablesVisitor implements VoidVisitor<Object> {
 		if (n.getFinallyBlock() != null) {
 			n.getFinallyBlock().accept(this, arg);
 		}
-
-		// TODO
 	}
 
 	@Override
 	public void visit(CatchClause n, Object arg) {
+		currentScope = n.getEnclosingScope();
+
 		n.getExcept().accept(this, arg);
 		n.getCatchBlock().accept(this, arg);
-
-		// TODO
 	}
 
 	@Override

@@ -26,5 +26,4 @@ public class MethodSymbol extends ScopedSymbol {
 	public void setParameters(List<Type> parameters) {
 		this.parameters = parameters;
 	}
-
 }

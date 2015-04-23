@@ -186,6 +186,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 			InterfaceSymbol interfaceSymbol = new InterfaceSymbol(n.getName());
 			interfaceSymbol.setEnclosingScope(currentScope);
 
+			currentScope.define(interfaceSymbol);
 			currentScope = interfaceSymbol;
 			n.setEnclosingScope(currentScope);
 
@@ -195,11 +196,11 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 				}
 			}
 			
-			currentScope = currentScope.getEnclosingScope();
 		} else {
 			ClassSymbol classSymbol =  new ClassSymbol(n.getName());
 			classSymbol.setEnclosingScope(currentScope);
 
+			currentScope.define(classSymbol);
 			currentScope = classSymbol;
 			n.setEnclosingScope(currentScope);
 
@@ -208,9 +209,9 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 					b.accept(this, arg);
 				}
 			}
-
-			currentScope = currentScope.getEnclosingScope();
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -218,6 +219,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 		EnumSymbol enumSymbol = new EnumSymbol(n.getName());
 		enumSymbol.setEnclosingScope(currentScope);
 
+		currentScope.define(enumSymbol);
 		currentScope = enumSymbol;
 		n.setEnclosingScope(currentScope);
 
@@ -243,6 +245,8 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 		if (n.getMembers() != null) {
 			visitMembers(n.getMembers(), arg);
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 
 	@Override
@@ -958,5 +962,7 @@ public class CreateScopesVisitor implements VoidVisitor<Object> {
 				s.accept(this, arg);
 			}
 		}
+
+		currentScope = currentScope.getEnclosingScope();
 	}
 }

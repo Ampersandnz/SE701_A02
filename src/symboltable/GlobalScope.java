@@ -24,6 +24,8 @@ public class GlobalScope extends BaseScope {
 		define(new VariableSymbol("b_reader", resolveType("BufferedReader")));
 		define(new VariableSymbol("b_writer", resolveType("BufferedWriter")));
 
+		define(new MethodSymbol("println"));
+		
 		MethodSymbol symbol = new MethodSymbol("readLine");
 		symbol.setReturnType(resolveType("String"));
 		define(symbol);
