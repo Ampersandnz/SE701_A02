@@ -180,6 +180,7 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 	@Override
 	public void visit(VariableDeclarator n, Object arg) {
 		Expression expr = n.getInit();
+
 		Symbol target = currentScope.resolve(n.getId().getName());
 
 		if (target == null) {
@@ -260,6 +261,12 @@ public class CheckVariableUseVisitor implements VoidVisitor<Object> {
 		} else if (expr instanceof MethodCallExpr) {
 			Symbol resolvedSymbol = currentScope
 					.resolve(((MethodCallExpr) expr).getName().toString());
+
+			if (resolvedSymbol == null) {
+				throw new A2SemanticsException("Resolved type "
+						+ ((MethodCallExpr) expr).getName().toString()
+						+ " was null! (on line " + n.getBeginLine() + ").");
+			}
 
 			if (resolvedSymbol instanceof MethodSymbol) {
 				MethodSymbol m = (MethodSymbol) resolvedSymbol;
